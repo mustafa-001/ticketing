@@ -33,6 +33,7 @@ public  class PaymentRepository  {
         // ?)", paymentDto.getUserId(), paymentDto.getPaymentType().ordinal());
         var parameters = new HashMap<String, Object>();
         parameters.put("user_id", payment.getUserId());
+        parameters.put("trip_id", payment.getTripId());
         parameters.put("payment_type", payment.getPaymentType().toString());
         parameters.put("card_number", payment.getCardNumber());
         parameters.put("payment_date", Timestamp.valueOf(payment.getPaymentTime()));

@@ -15,16 +15,23 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-    @Value("${rabbitmq.emailandsms.queue}")
-    private String email;
+
+    @Value("${rabbitmq.email.queue}")
+    private String emailQueueName;
+    @Value("${rabbitmq.sms.queue}")
+    private String smsQueueName;
 
     @Value("${rabbitmq.exchange}")
     private String exchange;
 
-
     @Bean
     public Queue emailQueue() {
-        return new Queue(email, false);
+        return new Queue(emailQueueName, false);
+    }
+
+    @Bean
+    public Queue smsQueue() {
+        return new Queue(smsQueueName, false);
     }
 
     @Bean
@@ -34,10 +41,14 @@ public class RabbitMQConfig {
 
     @Bean
     public Binding emailBinding(Queue emailQueue, DirectExchange exchange) {
-        return BindingBuilder.bind(emailQueue).to(exchange).with(email);
+        return BindingBuilder.bind(emailQueue).to(exchange).with(emailQueueName);
     }
 
     @Bean
+    public Binding smsBinding(Queue smsQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(smsQueue).to(exchange).with(smsQueueName);
+    }
+
     public MessageConverter jsonMessageConverter(ObjectMapper springInternalObjectMapper) {
         springInternalObjectMapper.findAndRegisterModules();
         return new Jackson2JsonMessageConverter(springInternalObjectMapper);

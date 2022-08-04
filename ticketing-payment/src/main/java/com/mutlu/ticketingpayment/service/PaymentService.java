@@ -24,6 +24,6 @@ public class PaymentService {
         if (paymentRepository.save(request.toPayment()) != null) {
             return PaymentResponse.SUCCESS;
         }
-        return PaymentResponse.UNCOMPLETE;
+        return PaymentResponse.INCOMPLETE;
     }
 }

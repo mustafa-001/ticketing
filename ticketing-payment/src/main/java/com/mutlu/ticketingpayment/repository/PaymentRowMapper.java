@@ -14,6 +14,7 @@ public class PaymentRowMapper implements RowMapper<Payment> {
         Payment result = new Payment();
         result.setPaymentId(rs.getLong("payment_id"));
         result.setUserId(rs.getLong("user_id"));
+        result.setTripId(rs.getLong("trip_id"));
         result.setPaymentType(PaymentType.valueOf(rs.getString("payment_type")));
         result.setCardNumber(rs.getString("card_number"));
         result.setPaymentTime(rs.getTimestamp("payment_date").toLocalDateTime());

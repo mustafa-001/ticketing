@@ -4,5 +4,5 @@ import mutlu.ticketingapp.dto.ClientPaymentInfoDto;
 
 import java.math.BigDecimal;
 
-public record PaymentRequestDto(ClientPaymentInfoDto clientPaymentInfo, Long userId, BigDecimal totalAmount) {
+public record PaymentRequestDto(ClientPaymentInfoDto clientPaymentInfo, Long userId, Long tripId, BigDecimal totalAmount) {
 }

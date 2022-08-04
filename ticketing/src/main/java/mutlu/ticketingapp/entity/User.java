@@ -26,6 +26,7 @@ public class User {
     private UserType userType;
     @Email
     private String email;
+    private String phoneNumber;
     private String firstName;
     private String lastName;
     @NotBlank
@@ -86,4 +87,12 @@ public class User {
         return ticketList;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public User setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+        return this;
+    }
 }

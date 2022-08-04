@@ -16,6 +16,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long paymentId;
     private Long userId;
+    private Long tripId;
     private PaymentType paymentType;
 
     private String cardNumber;
@@ -66,5 +67,14 @@ public class Payment {
 
     public Long getPaymentId() {
         return paymentId;
+    }
+
+    public Long getTripId() {
+        return tripId;
+    }
+
+    public Payment setTripId(Long tripId) {
+        this.tripId = tripId;
+        return this;
     }
 }

@@ -1,8 +1,13 @@
 package mutlu.ticketingapp.service;
 
 import mutlu.ticketingapp.common.PassengerGender;
+import mutlu.ticketingapp.common.PaymentResponse;
 import mutlu.ticketingapp.common.UserType;
+import mutlu.ticketingapp.config.PaymentClient;
+import mutlu.ticketingapp.config.RabbitMQConfig;
 import mutlu.ticketingapp.dto.*;
+import mutlu.ticketingapp.dto.GetTripDto;
+import mutlu.ticketingapp.dto.email_and_sms_service.TicketInformationMessageDto;
 import mutlu.ticketingapp.entity.Ticket;
 import mutlu.ticketingapp.entity.Trip;
 import mutlu.ticketingapp.entity.User;
@@ -11,6 +16,7 @@ import mutlu.ticketingapp.repository.TripRepository;
 import mutlu.ticketingapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,13 +28,17 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
+    private final PaymentClient paymentClient;
+    private final AmqpTemplate rabbitTemplate;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public TicketService(TicketRepository ticketRepository, TripRepository tripRepository, UserRepository userRepository) {
+    public TicketService(TicketRepository ticketRepository, TripRepository tripRepository, UserRepository userRepository, PaymentClient paymentClient, RabbitMQConfig rabbitMQConfig, AmqpTemplate rabbitTemplate) {
         this.ticketRepository = ticketRepository;
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
+        this.paymentClient = paymentClient;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public GetTicketDto addTicket(CreateTicketDto request) {
@@ -52,15 +62,26 @@ public class TicketService {
                 .setUser(user);
 
         ticket = ticketRepository.save(ticket);
-        PaymentRequestDto paymentRequestDto = new PaymentRequestDto(request.paymentDto(), trip.getPrice());
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto(request.clientPaymentInfoDto(), user.getUserId(), trip.getTripId(), trip.getPrice());
         log.info("Requesting payment from payment service with {}", paymentRequestDto);
-        //TODO make payment.
+        PaymentResponse paymentResponse = paymentClient.createPayment(paymentRequestDto);
+        if (paymentResponse == PaymentResponse.DENIED | paymentResponse == PaymentResponse.INCOMPLETE) {
+            throw new RuntimeException("Payment could not be made.");
+        }
         GetTicketDto ticketDto = GetTicketDto.fromTicket(ticket);
-        TicketInformationMessageDto ticketInformationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), List.of(ticketDto));
-        //TODO send information email.
+        TicketInformationMessageDto ticketInformationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), GetTripDto.fromTrip(trip), (long) 1);
+        log.info("Payment successful, sending SMS request to message queue. {}", ticketInformationMessage);
+        rabbitTemplate.convertAndSend("ticketing.sms", ticketInformationMessage);
 
         return ticketDto;
+    }
 
+    public List<GetTicketDto> getByUserId(Long userId) {
+        log.info("Querying tickets by user with id {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            throw new IllegalArgumentException("User cannot be found.");
+        });
+        return ticketRepository.findByUser(user).stream().map(GetTicketDto::fromTicket).toList();
     }
 
     private boolean checkCapacity(Trip trip, int ticketsRequestedInThisOrder) {
@@ -122,17 +143,26 @@ public class TicketService {
                     .setPassengerGender(r.passengerGender())
                     .setUser(user);
             ticket = ticketRepository.save(ticket);
-
             getTicketDtos.add(GetTicketDto.fromTicket(ticket));
         }
-        PaymentRequestDto paymentRequest = new PaymentRequestDto(requests.get(0).paymentDto(),
+        PaymentRequestDto paymentRequest = new PaymentRequestDto(requests.get(0).clientPaymentInfoDto(), user.getUserId(), trip.getTripId(),
                 trip.getPrice().multiply(BigDecimal.valueOf(requests.size())));
-        //TODO make payment.
 
-        TicketInformationMessageDto informationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), getTicketDtos);
-        //TODO send information email.
-        //TODO commit to database.
+        PaymentResponse paymentResponse = paymentClient.createPayment(paymentRequest);
+        if (paymentResponse == PaymentResponse.DENIED | paymentResponse == PaymentResponse.INCOMPLETE) {
+            throw new RuntimeException("Payment could not be made.");
+        }
+        TicketInformationMessageDto ticketInformationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), GetTripDto.fromTrip(trip), (long) getTicketDtos.size());
+        rabbitTemplate.convertAndSend(ticketInformationMessage);
         return getTicketDtos;
     }
 
+    public List<GetTripDto> search(SearchTripDto searchParameters) {
+        log.info("Searching tickets for {}", searchParameters);
+        return tripRepository.findByDepartureStationAndArrivalStationAndVehicleType(
+                searchParameters.departureStation(),
+                searchParameters.arrivalStation(),
+                searchParameters.vehicleType()
+        ).stream().filter(trip -> trip.getDeparture().toLocalDate().equals(searchParameters.date())).map(GetTripDto::fromTrip).toList();
+    }
 }

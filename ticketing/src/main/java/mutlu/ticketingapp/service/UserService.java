@@ -39,11 +39,13 @@ public class UserService {
         }
         user.setUserType(request.userType())
                 .setEmail(request.email())
+                .setPhoneNumber(request.phoneNumber())
                 .setFirstName(request.firstName())
                 .setLastName(request.lastName())
                 .setUserType(request.userType())
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new user: {}", user);
+        //TODO Send email.
         return GetUserDto.fromUser(userRepository.save(user));
     }
 
