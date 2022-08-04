@@ -1,4 +1,4 @@
-package mutlu.ticketingapp.dto;
+package mutlu.ticketingapp.dto.user;
 
 import mutlu.ticketingapp.common.UserType;
 import mutlu.ticketingapp.entity.User;

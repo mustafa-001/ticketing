@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.controller;
 
-import mutlu.ticketingapp.dto.*;
+import mutlu.ticketingapp.dto.user.*;
 import mutlu.ticketingapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

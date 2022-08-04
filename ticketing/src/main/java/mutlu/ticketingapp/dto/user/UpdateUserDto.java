@@ -1,4 +1,4 @@
-package mutlu.ticketingapp.dto;
+package mutlu.ticketingapp.dto.user;
 
 import javax.validation.constraints.NotBlank;
 

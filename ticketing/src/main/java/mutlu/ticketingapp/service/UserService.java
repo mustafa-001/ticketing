@@ -1,8 +1,10 @@
 package mutlu.ticketingapp.service;
 
 
-import mutlu.ticketingapp.dto.*;
+import mutlu.ticketingapp.dto.user.*;
 import mutlu.ticketingapp.entity.User;
+import mutlu.ticketingapp.exception.FieldsDoesNotMatchExceptionAbstract;
+import mutlu.ticketingapp.exception.LoginExceptionAbstract;
 import mutlu.ticketingapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +54,7 @@ public class UserService {
     public Optional<GetUserDto> getByUserId(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         log.debug("User for id {} is {}", userId, user.orElse(null));
-        //TODO
-        return Optional.of(GetUserDto.fromUser(user.get()));
+        return Optional.of(GetUserDto.fromUser(user.orElseThrow(() -> new InvalidParameterException("User with given id cannot be found."))));
     }
 
     public void delete(Long userId) {
@@ -79,12 +80,11 @@ public class UserService {
                 return user;
             } else {
                 log.info("Wrong password when logging in. Username: {}", email);
-                //TODO Make custom login exception.
-                throw new RuntimeException("Email or password is wrong.");
+                throw new LoginExceptionAbstract();
             }
         } else {
             log.info("User doesn't exists: {}", email);
-            throw new RuntimeException("Email or password is wrong.");
+            throw new LoginExceptionAbstract();
         }
     }
 
@@ -95,15 +95,15 @@ public class UserService {
     public GetUserDto changeEmail(ChangeEmailDto request) {
         //Authenticate the user.
         var user = login(request.oldEmail(), request.password());
-        if (!request.newEmailFirst().equals(request.newEmailSecond())){
-            throw new IllegalArgumentException("Emails does not match.");
+        if (!request.newEmailFirst().equals(request.newEmailSecond())) {
+            throw new FieldsDoesNotMatchExceptionAbstract("Email");
         }
         log.info("Changing email for {} to {}", user.getEmail(), request.newEmailFirst());
         user.setEmail(request.newEmailFirst());
         log.debug("Email before flush: {}", user.getEmail());
         userRepository.flush();
         log.debug("Email after flush: {}", user.getEmail());
-        return  GetUserDto.fromUser(user);
+        return GetUserDto.fromUser(user);
     }
 
     /**
@@ -120,7 +120,7 @@ public class UserService {
             userRepository.flush();
             log.debug("Password hash after flush {}", userRepository.findById(user.getUserId()).get().getPasswordHash());
         } else {
-            throw new RuntimeException("Passwords does not match.");
+            throw new FieldsDoesNotMatchExceptionAbstract("Password");
         }
         return GetUserDto.fromUser(user);
     }
