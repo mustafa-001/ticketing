@@ -17,41 +17,27 @@ import java.util.List;
  */
 //If another entity includes a User field when serializing/deserializing refer that field with it userId.
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
-@Entity(name = "users")
-public class User {
+public class AdminUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
-    @NotNull
-    private UserType userType;
     @Email
     private String email;
-    private String phoneNumber;
     private String firstName;
     private String lastName;
     @NotBlank
     private String passwordHash;
-    @OneToMany(mappedBy = "user")
-    private List<Ticket> ticketList = new ArrayList<>();
 
     public Long getUserId() {
         return userId;
     }
 
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public User setUserType(UserType userType) {
-        this.userType = userType;
-        return this;
-    }
 
     public String getEmail() {
         return email;
     }
 
-    public User setEmail(String email) {
+    public AdminUser setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -60,7 +46,7 @@ public class User {
         return firstName;
     }
 
-    public User setFirstName(String firstName) {
+    public AdminUser setFirstName(String firstName) {
         this.firstName = firstName;
         return this;
     }
@@ -69,7 +55,7 @@ public class User {
         return lastName;
     }
 
-    public User setLastName(String lastName) {
+    public AdminUser setLastName(String lastName) {
         this.lastName = lastName;
         return this;
     }
@@ -78,21 +64,8 @@ public class User {
         return passwordHash;
     }
 
-    public User setPasswordHash(String passwordHash) {
+    public AdminUser setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
-        return this;
-    }
-
-    public List<Ticket> getTicketList() {
-        return ticketList;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public User setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
         return this;
     }
 }

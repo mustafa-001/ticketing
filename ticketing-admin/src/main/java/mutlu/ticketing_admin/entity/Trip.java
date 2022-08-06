@@ -30,6 +30,7 @@ public class Trip {
     @FutureOrPresent
     private LocalDateTime departure;
 
+    private Boolean isCancelled = false;
     @NotNull
     private BigDecimal price;
     @OneToMany(mappedBy = "trip")
@@ -95,6 +96,15 @@ public class Trip {
 
     public Trip setPrice(BigDecimal price) {
         this.price = price;
+        return this;
+    }
+
+    public Boolean getCancelled() {
+        return isCancelled;
+    }
+
+    public Trip setCancelled(Boolean cancelled) {
+        isCancelled = cancelled;
         return this;
     }
 }

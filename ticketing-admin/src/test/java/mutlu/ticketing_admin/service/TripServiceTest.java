@@ -6,7 +6,7 @@ import mutlu.ticketing_admin.dto.GetTripDto;
 import mutlu.ticketing_admin.entity.Ticket;
 import mutlu.ticketing_admin.entity.Trip;
 import mutlu.ticketing_admin.repository.TripRepository;
-import mutlu.ticketing_admin.repository.UserRepository;
+import mutlu.ticketing_admin.repository.AdminUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -34,7 +34,7 @@ public class TripServiceTest {
     private TripRepository tripRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private AdminUserRepository adminUserRepository;
 
     Trip trip = new Trip();
 
@@ -79,7 +79,7 @@ public class TripServiceTest {
 
         Mockito.when(tripRepository.findById(Mockito.any())).thenReturn(Optional.of(trip));
 
-        BigDecimal totalGain = tripService.totalGainFromTrip(10L);
+        BigDecimal totalGain = tripService.totalRevenueFromTrip(10L);
 
         assertThat(totalGain.equals(BigDecimal.TEN.multiply(BigDecimal.valueOf(2L))));
     }
@@ -102,7 +102,7 @@ public class TripServiceTest {
     void shouldThrowIllegalArgumentExceptionWhenTripIdDoesNotExistsTotalGain() {
         Mockito.when(tripRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-        Throwable ex = catchThrowable(() -> tripService.totalGainFromTrip(10L));
+        Throwable ex = catchThrowable(() -> tripService.totalRevenueFromTrip(10L));
 
         assertThat(ex instanceof IllegalArgumentException);
     }

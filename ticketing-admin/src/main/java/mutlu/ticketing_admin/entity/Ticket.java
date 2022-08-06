@@ -29,21 +29,21 @@ public class Ticket {
         return this;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public Ticket setUser(User user) {
-        this.user = user;
-        return this;
-    }
-
     public Trip getTrip() {
         return trip;
     }
 
     public Ticket setTrip(Trip trip) {
         this.trip = trip;
+        return this;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Ticket setUser(User user) {
+        this.user = user;
         return this;
     }
 }

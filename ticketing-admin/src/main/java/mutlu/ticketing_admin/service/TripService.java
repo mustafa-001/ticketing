@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TripService {
 
     private final TripRepository tripRepository;
-    Logger log = LoggerFactory.getLogger(UserService.class);
+    Logger log = LoggerFactory.getLogger(AdminUserService.class);
 
     @Autowired
     public TripService(TripRepository tripRepository) {
@@ -45,7 +45,7 @@ public class TripService {
         return Optional.of(GetTripDto.fromTrip(trip.orElse(null)));
     }
 
-    public BigDecimal totalGainFromTrip(Long tripId) {
+    public BigDecimal totalRevenueFromTrip(Long tripId) {
         Optional<Trip> trip = tripRepository.findById(tripId);
         log.debug("Trip for id {} is {}", tripId, trip.orElse(null));
         if (trip.isEmpty()) {

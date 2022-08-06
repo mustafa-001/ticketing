@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.Access;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @RestController
@@ -28,4 +29,14 @@ public class TripController {
     Optional<GetTripDto> getTrip(@PathVariable Long tripId){
         return  tripService.getById(tripId);
     }
+
+    @GetMapping("/getSoldTickets/{tripId}")
+    Long getSoldTickets(@PathVariable Long tripId){
+        return tripService.totalSoldTicketsFromTrip(tripId);
+    }
+    @GetMapping("/getRevenueFromTrip/{tripId}")
+    BigDecimal getRevenueFromTrip(@PathVariable Long tripId){
+        return tripService.totalRevenueFromTrip(tripId);
+    }
+
 }
