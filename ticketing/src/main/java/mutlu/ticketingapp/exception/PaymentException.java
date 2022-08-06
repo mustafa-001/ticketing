@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.exception;
 
-import mutlu.ticketingapp.common.PaymentResponse;
+import mutlu.ticketingapp.enums.PaymentResponse;
 
 public class PaymentException extends AbstractTicketingException {
     public PaymentResponse getResponse() {

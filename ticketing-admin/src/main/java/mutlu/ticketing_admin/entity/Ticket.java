@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 //If another entity includes a User field when serializing/deserializing refer that field with it userId.
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "ticketId")
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

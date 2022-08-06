@@ -39,4 +39,9 @@ public class TripController {
         return tripService.totalRevenueFromTrip(tripId);
     }
 
+    @DeleteMapping("/{tripId}")
+    void cancel(@PathVariable Long tripId){
+        tripService.cancel(tripId);
+    }
+
 }

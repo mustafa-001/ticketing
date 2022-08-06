@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.dto.ticket;
 
-import mutlu.ticketingapp.common.PassengerGender;
+import mutlu.ticketingapp.enums.PassengerGender;
 
 import javax.validation.constraints.NotNull;
 

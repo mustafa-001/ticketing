@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.Optional;
 
 @Service
@@ -34,11 +33,13 @@ public class UserService {
 
     /**
      * Creates and saves to database a new User entity with it's password hashed with {@link PasswordEncoder}.
+     *
+     * @throws IllegalArgumentException if passwords does not match.
      */
     public GetUserDto create(CreateUserDto request) {
         User user = new User();
         if (!request.firstPassword().equals(request.secondPassword())) {
-            throw new InvalidParameterException("Passwords doesn't match.");
+            throw new IllegalArgumentException("Passwords does not match.");
         }
         user.setUserType(request.userType())
                 .setEmail(request.email())
@@ -52,18 +53,38 @@ public class UserService {
         return GetUserDto.fromUser(userRepository.save(user));
     }
 
+
+    /**
+     * Return User with given userId.
+     *
+     * @throws IllegalArgumentException if it does not exist.
+     */
     public Optional<GetUserDto> getByUserId(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         log.debug("User for id {} is {}", userId, user.orElse(null));
-        return Optional.of(GetUserDto.fromUser(user.orElseThrow(() -> new InvalidParameterException("User with given id cannot be found."))));
+        return Optional.of(GetUserDto.fromUser(user.orElseThrow(
+                () -> new IllegalArgumentException("User with given id cannot be found."))));
     }
 
+    /**
+     * Mark User with given userId as deleted to be excluded from future queries.
+     *
+     * @throws IllegalArgumentException if it does not exist.
+     */
     public void delete(Long userId) {
-        userRepository.deleteById(userId);
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("User with given id cannot be found.");
+        }
+        log.info("Marking user {} as deleted.", userOpt.get());
+        userOpt.get().setDeleted(true);
+        userRepository.flush();
     }
 
     /**
      * Tries to log user in, if successful returns that User entity.
+     *
+     * @throws LoginException
      */
     public GetUserDto login(LoginCredentialsDto credentialsDto) {
         return GetUserDto.fromUser(login(credentialsDto.email(), credentialsDto.password()));
@@ -90,8 +111,11 @@ public class UserService {
     }
 
     /**
-     * If logging user in is successfull (to make sure credentials right)
-     * changes user's username.
+     * If logging user in is successful (to make sure credentials right)
+     * changes User's username.
+     *
+     * @throws LoginException              If credentials wrong.
+     * @throws FieldsDoesNotMatchException
      */
     public GetUserDto changeEmail(ChangeEmailDto request) {
         //Authenticate the user.
@@ -110,6 +134,9 @@ public class UserService {
     /**
      * Compares {@link ChangePasswordDto}'s newPassword field's hash values and logs user.
      * If both is successful changes user's passwordHash fiels to newPassword's hash value.
+     *
+     * @throws LoginException              .
+     * @throws FieldsDoesNotMatchException .
      */
     public GetUserDto changePassword(ChangePasswordDto changePasswordDto) {
         //Authenticate the user.
@@ -117,12 +144,24 @@ public class UserService {
         log.info("Changing password for {}: ", user.getEmail());
         if (changePasswordDto.newPasswordFirst().equals(changePasswordDto.newPasswordSecond())) {
             user.setPasswordHash(passwordEncoder.encode(changePasswordDto.newPasswordFirst()));
-            log.debug("Password hash before flush {}", userRepository.findById(user.getUserId()).get().getPasswordHash());
+            log.debug("Password hash before flush {}",
+                    userRepository.findById(user.getUserId()).get().getPasswordHash());
             userRepository.flush();
-            log.debug("Password hash after flush {}", userRepository.findById(user.getUserId()).get().getPasswordHash());
+            log.debug("Password hash after flush {}",
+                    userRepository.findById(user.getUserId()).get().getPasswordHash());
         } else {
             throw new FieldsDoesNotMatchException("Password");
         }
+        return GetUserDto.fromUser(user);
+    }
+
+    public GetUserDto update(UpdateUserDto request) {
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> new IllegalArgumentException());
+        log.info("Updating user {}", user);
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+
         return GetUserDto.fromUser(user);
     }
 }

@@ -3,7 +3,8 @@ package mutlu.ticketingapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import mutlu.ticketingapp.common.UserType;
+import mutlu.ticketingapp.enums.UserType;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -15,8 +16,8 @@ import java.util.List;
 /**
  * Entity representing a user. Includes both account information (login etc) and usage details.
  */
-//If another entity includes a User field when serializing/deserializing refer that field with it userId.
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
+@Where(clause = "deleted=false") //Do not return soft deleted entities in queries.
 @Entity(name = "users")
 public class User {
     @Id
@@ -31,8 +32,11 @@ public class User {
     private String lastName;
     @NotBlank
     private String passwordHash;
+
+    private boolean deleted = false;
     @OneToMany(mappedBy = "user")
     private List<Ticket> ticketList = new ArrayList<>();
+
 
     public Long getUserId() {
         return userId;
@@ -93,6 +97,25 @@ public class User {
 
     public User setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+        return this;
+    }
+
+    public User setUserId(Long userId) {
+        this.userId = userId;
+        return this;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public User setDeleted(boolean deleted) {
+        this.deleted = deleted;
+        return this;
+    }
+
+    public User setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
         return this;
     }
 }

@@ -1,4 +1,4 @@
-package mutlu.ticketing_admin.common;
+package mutlu.ticketing_admin.enums;
 
 public enum VehicleType {
     PLANE,

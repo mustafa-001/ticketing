@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.dto.ticket;
 
-import mutlu.ticketingapp.common.PaymentType;
+import mutlu.ticketingapp.enums.PaymentType;
 
 public record ClientPaymentInfoDto(PaymentType paymentType, String cardNumber) {
 }

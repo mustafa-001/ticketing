@@ -3,7 +3,8 @@ package mutlu.ticketing_admin.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import mutlu.ticketing_admin.common.VehicleType;
+import mutlu.ticketing_admin.enums.VehicleType;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.FutureOrPresent;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-//If another entity includes a Trip field when serializing/deserializing refer that field with it userId.
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tripId")
 @Entity
 public class Trip {

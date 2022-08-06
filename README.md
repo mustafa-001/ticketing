@@ -64,16 +64,12 @@ Kullanıcılar sisteme kaydolduklarında e-posta, bilet aldıklarında da SMS g�
 
 ### Gereksinimler
 Sistemden `docker` ile de karşılanabilecek 3 teknolojiye gereksinim duyar.
-- PostgreSQL (localhost:5432 portunda çalışan):
- 
-    ```docker run --name ticketing-db -d   -e POSTGRES_PASSWORD=pgpassword  -p 5432:5432 postgres```
- 
-- MongoDB (localhost:27017 portunda çalışan):
- 
-  ```docker run -d -p 27017:27017 --name ticketing-message-db mongo:latest```
-- RabbitMQ(localhost:5672 portunda çalışan):
- 
-    ```docker run -d --name ticketing-mq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=123456 -p 15672:15672 -p 5672:5672 rabbitmq:3-management```
+`docker-compose.yml` dosyasında bunların hepsi tanımlıdır ve `docker compose up` ile çalıştırılabilir.
+
+- PostgreSQL (localhost:5432 portunda çalışan)
+- MongoDB (localhost:27017 portunda çalışan)
+- RabbitMQ(localhost:5672 portunda çalışan)
+- PostgreSQL (localhost:5433 portunda çalışan)
 
 ### Çalıştırma
 Daha sonra `ticketing`, `ticketing-admin`, `ticketing-payment` ve `ticketing-emailandsms` dizinlerinde `./mvnw spring-boot:run`

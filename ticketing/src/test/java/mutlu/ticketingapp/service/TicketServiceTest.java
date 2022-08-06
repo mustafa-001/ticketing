@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.service;
 
-import mutlu.ticketingapp.common.*;
+import mutlu.ticketingapp.enums.*;
 import mutlu.ticketingapp.config.PaymentClient;
 import mutlu.ticketingapp.dto.email_and_sms_service.TicketInformationMessageDto;
 import mutlu.ticketingapp.dto.ticket.ClientPaymentInfoDto;
@@ -10,6 +10,7 @@ import mutlu.ticketingapp.dto.ticket.SearchTripDto;
 import mutlu.ticketingapp.entity.Ticket;
 import mutlu.ticketingapp.entity.Trip;
 import mutlu.ticketingapp.entity.User;
+import mutlu.ticketingapp.exception.CannotSellTicketsException;
 import mutlu.ticketingapp.exception.UserCannotBuyMoreTicketsException;
 import mutlu.ticketingapp.repository.TicketRepository;
 import mutlu.ticketingapp.repository.TripRepository;
@@ -243,7 +244,7 @@ public class TicketServiceTest {
 
         Throwable ex = catchThrowable(() -> ticketService.addTicketBulk(ticketDtoList));
 
-        assertThat(ex instanceof UserCannotBuyMoreTicketsException);
+        assertThat(ex instanceof CannotSellTicketsException);
     }
 
     @Test

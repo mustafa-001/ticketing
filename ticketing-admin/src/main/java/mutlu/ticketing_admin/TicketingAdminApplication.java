@@ -7,10 +7,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
-public class TicketingappApplication {
+public class TicketingAdminApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TicketingappApplication.class, args);
+        SpringApplication.run(TicketingAdminApplication.class, args);
     }
 
     @Bean

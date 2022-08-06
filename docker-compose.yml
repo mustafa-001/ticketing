@@ -1,0 +1,36 @@
+
+version: "3.3"
+services:
+  ticketing-db:
+    container_name: ticketing-db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=pgpassword
+      - POSTGRES_DB=ticketing
+
+  rabbitmq:
+    container_name: ticketing-mq
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: 123456
+
+  ticketing-payment-db:
+    container_name: ticketing-payment-db
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=pgpassword
+      - POSTGRES_DB=ticketing-payment
+
+  email-db:
+    container_name: ticketing-message-db
+    image: mongo
+    ports:
+      - "27017:27017"

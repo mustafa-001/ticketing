@@ -17,6 +17,7 @@ public class AppConfig {
                         constraint payments_pk
                             primary key,
                     user_id      int,
+                    trip_id     int,
                     payment_type varchar(20),
                     card_number varchar(40),
                     payment_date timestamp

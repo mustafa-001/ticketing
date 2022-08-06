@@ -30,7 +30,8 @@ public class TripService {
         trip.setVehicleType(createTripDto.vehicleType())
                 .setDepartureStation(createTripDto.departureStation())
                 .setArrivalStation(createTripDto.arrivalStation())
-                .setDeparture(createTripDto.departureTime());
+                .setDeparture(createTripDto.departureTime())
+                .setPrice(createTripDto.price());
         Trip savedTrip = tripRepository.save(trip);
         return GetTripDto.fromTrip(savedTrip);
     }
@@ -65,8 +66,13 @@ public class TripService {
         return trip.get().getTicketList().size();
     }
 
-    public void delete(Long tripId) {
-        log.debug("Deleting trip with Id: {}", tripId);
-        tripRepository.deleteById(tripId);
+    public void cancel(Long tripId) {
+        Optional<Trip> tripOpt = tripRepository.findById(tripId);
+        if (tripOpt.isEmpty()) {
+            throw new IllegalArgumentException("Trip with given id cannot be found.");
+        }
+        log.info("Marking user {} as deleted.", tripOpt.get());
+        tripOpt.get().setCancelled(true);
+        tripRepository.flush();
     }
 }

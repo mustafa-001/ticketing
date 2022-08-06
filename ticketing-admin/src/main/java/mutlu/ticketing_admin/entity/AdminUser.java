@@ -1,22 +1,16 @@
 package mutlu.ticketing_admin.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import mutlu.ticketing_admin.common.UserType;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Entity representing a user. Includes both account information (login etc) and usage details.
+ * Entity representing an admin.
  */
-//If another entity includes a User field when serializing/deserializing refer that field with it userId.
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
+@Where(clause = "deleted=false") //Do not return soft deleted entities in queries.
 @Entity
 public class AdminUser {
     @Id
@@ -26,6 +20,8 @@ public class AdminUser {
     private String email;
     private String firstName;
     private String lastName;
+
+    private boolean deleted = false;
     @NotBlank
     private String passwordHash;
 
@@ -67,6 +63,20 @@ public class AdminUser {
 
     public AdminUser setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+        return this;
+    }
+
+    public AdminUser setUserId(Long userId) {
+        this.userId = userId;
+        return this;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public AdminUser setDeleted(boolean deleted) {
+        this.deleted = deleted;
         return this;
     }
 }

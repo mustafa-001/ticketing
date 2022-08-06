@@ -32,9 +32,9 @@ public class TicketController {
         return ticketService.addTicketBulk(requests);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/{userId}")
     public List<GetTicketDto> getByUserId(@PathVariable Long userId){
-        return  ticketService.getByUserId(userId);
+        return ticketService.getByUserId(userId);
     }
 
     @GetMapping("/search")

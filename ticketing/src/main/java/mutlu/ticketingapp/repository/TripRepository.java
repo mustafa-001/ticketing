@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.repository;
 
-import mutlu.ticketingapp.common.VehicleType;
+import mutlu.ticketingapp.enums.VehicleType;
 import mutlu.ticketingapp.entity.Trip;
 import org.springframework.data.jpa.repository.JpaRepository;
 

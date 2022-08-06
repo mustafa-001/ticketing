@@ -3,7 +3,8 @@ package mutlu.ticketingapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import mutlu.ticketingapp.common.VehicleType;
+import mutlu.ticketingapp.enums.VehicleType;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.FutureOrPresent;
@@ -16,6 +17,7 @@ import java.util.List;
 
 //If another entity includes a Trip field when serializing/deserializing refer that field with it userId.
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tripId")
+@Where(clause = "is_cancelled=false") //Do not return cancelled entitites to client.
 @Entity
 public class Trip {
     @Id
@@ -29,6 +31,8 @@ public class Trip {
     private String arrivalStation;
     @FutureOrPresent
     private LocalDateTime departure;
+
+    private Boolean isCancelled = false;
     @NotNull
     private BigDecimal price;
     @OneToMany(mappedBy = "trip")
@@ -94,6 +98,15 @@ public class Trip {
 
     public Trip setPrice(BigDecimal price) {
         this.price = price;
+        return this;
+    }
+
+    public Boolean getCancelled() {
+        return isCancelled;
+    }
+
+    public Trip setCancelled(Boolean cancelled) {
+        isCancelled = cancelled;
         return this;
     }
 }

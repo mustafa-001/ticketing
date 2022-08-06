@@ -2,7 +2,7 @@ package mutlu.ticketingapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import mutlu.ticketingapp.common.PassengerGender;
+import mutlu.ticketingapp.enums.PassengerGender;
 
 import javax.persistence.*;
 

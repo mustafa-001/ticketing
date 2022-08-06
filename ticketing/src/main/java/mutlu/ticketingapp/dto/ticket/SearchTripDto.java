@@ -1,6 +1,6 @@
 package mutlu.ticketingapp.dto.ticket;
 
-import mutlu.ticketingapp.common.VehicleType;
+import mutlu.ticketingapp.enums.VehicleType;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;

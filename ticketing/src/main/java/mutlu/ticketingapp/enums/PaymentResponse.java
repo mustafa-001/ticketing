@@ -1,4 +1,4 @@
-package mutlu.ticketingapp.common;
+package mutlu.ticketingapp.enums;
 
 public enum PaymentResponse {
     SUCCESS,

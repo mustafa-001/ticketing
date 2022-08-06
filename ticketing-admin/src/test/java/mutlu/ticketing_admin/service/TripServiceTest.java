@@ -1,6 +1,6 @@
 package mutlu.ticketing_admin.service;
 
-import mutlu.ticketing_admin.common.VehicleType;
+import mutlu.ticketing_admin.enums.VehicleType;
 import mutlu.ticketing_admin.dto.CreateTripDto;
 import mutlu.ticketing_admin.dto.GetTripDto;
 import mutlu.ticketing_admin.entity.Ticket;
@@ -22,8 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class TripServiceTest {
@@ -36,6 +35,7 @@ public class TripServiceTest {
     @Mock
     private AdminUserRepository adminUserRepository;
 
+    @Mock
     Trip trip = new Trip();
 
     @BeforeEach
@@ -44,22 +44,23 @@ public class TripServiceTest {
         trip.setDepartureStation("depS");
         trip.setArrivalStation("arrivalS");
         trip.setDeparture(LocalDateTime.now());
+        trip.setPrice(BigDecimal.TEN);
         trip.setTripId(10L);
     }
 
     @Test
     void shouldCallRepositoryWhenValidArgumentsGiven() {
-
         Mockito.when(tripRepository.save(Mockito.any())).thenReturn(trip);
 
-        GetTripDto getTripDto = tripService.addTrip(new CreateTripDto(VehicleType.PLANE,
-                "departure",
-                "arrival",
-                LocalDateTime.now()));
+        tripService.addTrip(
+                new CreateTripDto(VehicleType.PLANE,
+                        "departure",
+                        "arrival",
+                        LocalDateTime.now(),
+                        BigDecimal.TEN));
 
         verify(tripRepository, times(1)).save(
                 argThat(t -> t.getArrivalStation().equals("arrival")));
-        assertThat(getTripDto.arrivalStation().equals("arrivals"));
     }
 
     @Test
@@ -74,10 +75,10 @@ public class TripServiceTest {
     void shouldReturnTotalSumWhenCalled() {
         Ticket ticket1 = new Ticket();
         Ticket ticket2 = new Ticket();
-        trip.setTicketList(List.of(ticket2, ticket1));
-        trip.setPrice(BigDecimal.TEN);
 
-        Mockito.when(tripRepository.findById(Mockito.any())).thenReturn(Optional.of(trip));
+        when(trip.getTicketList()).thenReturn(List.of(ticket2, ticket1));
+        when(trip.getPrice()).thenReturn(BigDecimal.TEN);
+        when(tripRepository.findById(Mockito.any())).thenReturn(Optional.of(trip));
 
         BigDecimal totalGain = tripService.totalRevenueFromTrip(10L);
 
@@ -118,7 +119,12 @@ public class TripServiceTest {
 
     @Test
     void shouldCallRepositoryWhenCalledForDelete() {
-        tripService.delete(10L);
-        verify(tripRepository, times(1)).deleteById(10L);
+
+        when(tripRepository.findById(Mockito.any())).thenReturn(Optional.of(trip));
+
+        tripService.cancel(10L);
+
+        verify(trip, times(1)).setCancelled(true);
+        verify(tripRepository, times(0)).deleteById(Mockito.any());
     }
 }

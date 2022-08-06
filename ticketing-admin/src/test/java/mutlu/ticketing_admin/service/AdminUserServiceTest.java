@@ -1,12 +1,11 @@
-package mutlu.ticketingapp.service;
+package mutlu.ticketing_admin.service;
 
 
-import mutlu.ticketingapp.enums.UserType;
-import mutlu.ticketingapp.dto.user.*;
-import mutlu.ticketingapp.entity.User;
-import mutlu.ticketingapp.exception.FieldsDoesNotMatchException;
-import mutlu.ticketingapp.exception.LoginException;
-import mutlu.ticketingapp.repository.UserRepository;
+import mutlu.ticketing_admin.dto.*;
+import mutlu.ticketing_admin.entity.AdminUser;
+import mutlu.ticketing_admin.exception.FieldsDoesNotMatchException;
+import mutlu.ticketing_admin.exception.LoginException;
+import mutlu.ticketing_admin.repository.AdminUserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,74 +26,74 @@ import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
-class UserServiceTest {
+class AdminUserServiceTest {
 
     @InjectMocks
-    private UserService userService;
+    private AdminUserService adminUserService;
 
     @Mock
     private RabbitTemplate rabbitTemplate;
 
     @Mock
-    private User user;
+    private AdminUser adminUser;
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private UserRepository userRepository;
+    private AdminUserRepository adminUserRepository;
 
 
     @BeforeEach
     void init() {
-        user.setEmail("aaa@bbb.com");
+        adminUser.setEmail("aaa@bbb.com");
     }
 
     @Test
     void shouldThrowExceptionWhenPasswordsDoesNotMatch() {
-        CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
+        CreateAdminUserDto userDto = new CreateAdminUserDto("abc@xyz.com",
                 "aa", "bb", "password", "differentPassword");
 
-        Throwable exception = catchThrowable(() -> userService.create(userDto));
+        Throwable exception = catchThrowable(() -> adminUserService.create(userDto));
         assertThat(exception instanceof FieldsDoesNotMatchException);
     }
 
     @Test
     void shouldSendEmailToQueueWhenRegistrySuccessful() {
-        CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
+        CreateAdminUserDto userDto = new CreateAdminUserDto("abc@xyz.com",
                 "aa", "bb", "password", "password");
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(new User());
+        Mockito.when(adminUserRepository.save(Mockito.any())).thenReturn(new AdminUser());
         Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn("");
 
-        userService.create(userDto);
+        adminUserService.create(userDto);
 
         verify(rabbitTemplate, times(1)).convertAndSend(Mockito.any());
-        verify(userRepository, times(1)).save(Mockito.any());
+        verify(adminUserRepository, times(1)).save(Mockito.any());
     }
 
     @Test
     void shouldEncyrptPasswordWhenRegistry() {
-        CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
+        CreateAdminUserDto userDto = new CreateAdminUserDto("abc@xyz.com",
                 "aa", "bb", "password", "password");
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(new User());
+        Mockito.when(adminUserRepository.save(Mockito.any())).thenReturn(new AdminUser());
         Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn("hashedPassword");
 
-        userService.create(userDto);
+        adminUserService.create(userDto);
 
         verify(passwordEncoder, times(1)).encode(Mockito.any());
-        verify(userRepository)
+        verify(adminUserRepository)
                 .save(argThat(x -> !x.getPasswordHash().equals(userDto.firstPassword())));
-        verify(userRepository)
+        verify(adminUserRepository)
                 .save(argThat(x -> !x.getPasswordHash().equals(userDto.secondPassword())));
-        verify(userRepository)
+        verify(adminUserRepository)
                 .save(argThat(x -> !x.getPasswordHash().isEmpty()));
     }
 
     @Test
     void shouldThrowInvalidParameterWhenInvalidUserIdIsGiven() {
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        Mockito.when(adminUserRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Throwable ex = catchThrowable(() -> userService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> adminUserService.getByUserId(1L));
 
         assertThat(ex instanceof InvalidParameterException);
 
@@ -102,21 +101,21 @@ class UserServiceTest {
 
     @Test
     void shouldCallUpdateDeletedFieldWithNoOtherModification() {
-        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        when(adminUserRepository.findById(Mockito.any())).thenReturn(Optional.of(adminUser));
 
-        userService.delete(100L);
+        adminUserService.delete(100L);
 
-        verify(user, times(1)).setDeleted(true);
-        verify(userRepository, times(0)).deleteById(Mockito.any());
-        verify(userRepository, times(0)).delete(Mockito.any());
+        verify(adminUser, times(1)).setDeleted(true);
+        verify(adminUserRepository, times(0)).deleteById(Mockito.any());
+        verify(adminUserRepository, times(0)).delete(Mockito.any());
     }
 
 
     @Test
     void shouldThrowLoginExceptionWhenUserWithEmailDoesNotExist() {
-        when(userRepository.findUserByEmail("aaa@bbb.com")).thenReturn(Optional.empty());
+        when(adminUserRepository.findUserByEmail("aaa@bbb.com")).thenReturn(Optional.empty());
 
-        Throwable ex = catchThrowable(() -> userService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> adminUserService.getByUserId(1L));
 
         assertThat(ex instanceof LoginException);
     }
@@ -125,19 +124,19 @@ class UserServiceTest {
     void shouldThrowLoginExceptionWhenPasswordsDoesNotMatch() {
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(false);
 
-        Throwable ex = catchThrowable(() -> userService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> adminUserService.getByUserId(1L));
 
         assertThat(ex instanceof LoginException);
     }
 
     @Test
     void shouldCallPasswordEncoderMatchesWithCorrectArguments() {
-        when(user.getPasswordHash()).thenReturn("somePasswordHash");
-        when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
+        when(adminUser.getPasswordHash()).thenReturn("somePasswordHash");
+        when(adminUserRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(adminUser));
         LoginCredentialsDto loginCredentials =
                 new LoginCredentialsDto(Mockito.any(), "somePassword");
 
-        catchThrowable(() -> userService.login(loginCredentials));
+        catchThrowable(() -> adminUserService.login(loginCredentials));
 
         verify(passwordEncoder).matches("somePassword", "somePasswordHash");
     }
@@ -145,12 +144,12 @@ class UserServiceTest {
     @Test
     void shouldReturnUserDtoWhenCorrectArgumentsGiven() {
         LoginCredentialsDto loginCredentialsDto = new LoginCredentialsDto("aaa@bbb.com", "123123");
-        User user = new User();
+        AdminUser user = new AdminUser();
         user.setFirstName("Java");
-        when(userRepository.findUserByEmail("aaa@bbb.com")).thenReturn(Optional.of(user));
+        when(adminUserRepository.findUserByEmail("aaa@bbb.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(true);
 
-        GetUserDto userDto = userService.login(loginCredentialsDto);
+        GetAdminUserDto userDto = adminUserService.login(loginCredentialsDto);
 
         Assertions.assertEquals(userDto.firstName(), user.getFirstName());
     }
@@ -159,11 +158,11 @@ class UserServiceTest {
     void shouldThrowFieldsDoesNotMatchWhenCalledWithWrongArguments() {
         ChangeEmailDto changeEmailDto =
                 new ChangeEmailDto("", "new@email.com", "moreNew@email.com", "");
-        User user = new User();
-        when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
+        AdminUser user = new AdminUser();
+        when(adminUserRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(true);
 
-        Throwable ex = catchThrowable(() -> userService.changeEmail(changeEmailDto));
+        Throwable ex = catchThrowable(() -> adminUserService.changeEmail(changeEmailDto));
 
         assertThat(ex instanceof FieldsDoesNotMatchException);
     }
@@ -172,11 +171,11 @@ class UserServiceTest {
     void shouldChangeEmailWhenCalledWithCorrectArguments() {
         ChangeEmailDto changeEmailDto =
                 new ChangeEmailDto("", "new@email.com", "new@email.com", "");
-        User user = new User();
-        when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
+        AdminUser user = new AdminUser();
+        when(adminUserRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(true);
 
-        GetUserDto userDto = userService.changeEmail(changeEmailDto);
+        GetAdminUserDto userDto = adminUserService.changeEmail(changeEmailDto);
 
         Assertions.assertEquals(userDto.email(), changeEmailDto.newEmailFirst());
         Assertions.assertEquals(userDto.email(), changeEmailDto.newEmailSecond());
@@ -187,11 +186,11 @@ class UserServiceTest {
     void changePasswordShouldThrowFieldsDoesNotMatchWhenCalledWithWrongArguments() {
         ChangePasswordDto changePasswordDto =
                 new ChangePasswordDto("", "", "newPassword", "newPasswordTypo");
-        User user = new User();
-        when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
+        AdminUser user = new AdminUser();
+        when(adminUserRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(true);
 
-        Throwable ex = catchThrowable(() -> userService.changePassword(changePasswordDto));
+        Throwable ex = catchThrowable(() -> adminUserService.changePassword(changePasswordDto));
 
         assertThat(ex instanceof FieldsDoesNotMatchException);
     }
@@ -200,34 +199,13 @@ class UserServiceTest {
     void shouldChangePasswordWhenCalledWithCorrectArguments() {
         ChangePasswordDto changePasswordDto =
                 new ChangePasswordDto("", "", "newPassword", "newPassword");
-        when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
-        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        when(adminUserRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(adminUser));
+        when(adminUserRepository.findById(Mockito.any())).thenReturn(Optional.of(adminUser));
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(true);
         when(passwordEncoder.encode(Mockito.any())).thenReturn("passwordHash");
 
-        userService.changePassword(changePasswordDto);
+        adminUserService.changePassword(changePasswordDto);
 
-        verify(user).setPasswordHash("passwordHash");
+        verify(adminUser).setPasswordHash("passwordHash");
     }
-
-    @Test
-    void shouldUpdateFirstNameAndSecondName(){
-        UpdateUserDto updateUserDto = new UpdateUserDto(1L, "name", "surname");
-        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
-
-        userService.update(updateUserDto);
-
-        verify(user, times(1)).setFirstName(updateUserDto.firstName());
-        verify(user, times(1)).setLastName(updateUserDto.lastName());
-    }
-
-    @Test
-    void shouldThrowInvalidParameterWhenInvalidUserIdIsGivenToUpdate() {
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Throwable ex = catchThrowable(() -> userService.update(new UpdateUserDto(1L, "", "")));
-
-        assertThat(ex instanceof InvalidParameterException);
-    }
-
 }

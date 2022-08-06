@@ -1,17 +1,17 @@
 package mutlu.ticketingapp.service;
 
 import feign.RetryableException;
-import mutlu.ticketingapp.common.PassengerGender;
-import mutlu.ticketingapp.common.PaymentResponse;
-import mutlu.ticketingapp.common.UserType;
 import mutlu.ticketingapp.config.PaymentClient;
-import mutlu.ticketingapp.config.RabbitMQConfig;
 import mutlu.ticketingapp.dto.email_and_sms_service.TicketInformationMessageDto;
 import mutlu.ticketingapp.dto.ticket.*;
 import mutlu.ticketingapp.dto.user.GetUserDto;
 import mutlu.ticketingapp.entity.Ticket;
 import mutlu.ticketingapp.entity.Trip;
 import mutlu.ticketingapp.entity.User;
+import mutlu.ticketingapp.enums.PassengerGender;
+import mutlu.ticketingapp.enums.PaymentResponse;
+import mutlu.ticketingapp.enums.UserType;
+import mutlu.ticketingapp.exception.CannotSellTicketsException;
 import mutlu.ticketingapp.exception.NotEnoughTicketsLeftException;
 import mutlu.ticketingapp.exception.PaymentException;
 import mutlu.ticketingapp.exception.UserCannotBuyMoreTicketsException;
@@ -37,7 +37,12 @@ public class TicketService {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public TicketService(TicketRepository ticketRepository, TripRepository tripRepository, UserRepository userRepository, PaymentClient paymentClient, RabbitMQConfig rabbitMQConfig, AmqpTemplate rabbitTemplate) {
+    public TicketService(TicketRepository ticketRepository,
+                         TripRepository tripRepository,
+                         UserRepository userRepository,
+                         PaymentClient paymentClient,
+                         AmqpTemplate rabbitTemplate) {
+
         this.ticketRepository = ticketRepository;
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
@@ -56,7 +61,7 @@ public class TicketService {
 
         checkMaximumTicketLimits(user, trip, 1);
 
-        if (!checkCapacity(trip, 1)) {
+        if (checkIfVehicleIsFull(trip, 1)) {
             throw new NotEnoughTicketsLeftException();
         }
 
@@ -84,8 +89,8 @@ public class TicketService {
         return ticketRepository.findByUser(user).stream().map(GetTicketDto::fromTicket).toList();
     }
 
-    private boolean checkCapacity(Trip trip, int ticketsRequestedInThisOrder) {
-        return ticketRepository.findByTrip(trip).size() + ticketsRequestedInThisOrder <= trip.getVehicleType().getCapacity();
+    private boolean checkIfVehicleIsFull(Trip trip, int ticketsRequestedInThisOrder) {
+        return ticketRepository.findByTrip(trip).size() + ticketsRequestedInThisOrder > trip.getVehicleType().getCapacity();
     }
 
     private void checkMaximumTicketLimits(User user, Trip trip, int ticketsRequestedInThisOrder) {
@@ -128,12 +133,13 @@ public class TicketService {
 
         checkMaximumTicketLimits(user, trip, requests.size());
 
-        if (!checkCapacity(trip, 1)) {
+        if (checkIfVehicleIsFull(trip, 1)) {
             throw new NotEnoughTicketsLeftException();
         }
 
         if (malePassengerForThisOrder > 2) {
-            throw new UserCannotBuyMoreTicketsException(null);
+            throw new CannotSellTicketsException("An individual User cannot buy more than 2 tickets for Male " +
+                    "passengers in a request.");
         }
 
         List<GetTicketDto> getTicketDtos = new ArrayList<>();
@@ -155,7 +161,7 @@ public class TicketService {
     }
 
     private void handlePayment(PaymentRequestDto paymentRequest) {
-        PaymentResponse paymentResponse = null;
+        PaymentResponse paymentResponse;
         try {
             paymentResponse = paymentClient.createPayment(paymentRequest);
         } catch (RetryableException e) {
