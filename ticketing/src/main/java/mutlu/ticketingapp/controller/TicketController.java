@@ -1,7 +1,10 @@
 package mutlu.ticketingapp.controller;
 
 
-import mutlu.ticketingapp.dto.*;
+import mutlu.ticketingapp.dto.ticket.CreateTicketDto;
+import mutlu.ticketingapp.dto.ticket.GetTicketDto;
+import mutlu.ticketingapp.dto.ticket.GetTripDto;
+import mutlu.ticketingapp.dto.ticket.SearchTripDto;
 import mutlu.ticketingapp.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,22 +23,22 @@ public class TicketController {
     private final TicketService ticketService;
 
     @PostMapping("/buy")
-    public ticket.GetTicketDto add(@RequestBody @Valid ticket.CreateTicketDto request){
+    public GetTicketDto add(@RequestBody @Valid CreateTicketDto request){
         return ticketService.addTicket(request);
     }
 
     @PostMapping("/buyBulk")
-    public List<ticket.GetTicketDto> addAll(@RequestBody List<ticket.CreateTicketDto> requests){
+    public List<GetTicketDto> addAll(@RequestBody List<CreateTicketDto> requests){
         return ticketService.addTicketBulk(requests);
     }
 
     @GetMapping("/user/{id}")
-    public List<ticket.GetTicketDto> getByUserId(@PathVariable Long userId){
+    public List<GetTicketDto> getByUserId(@PathVariable Long userId){
         return  ticketService.getByUserId(userId);
     }
 
     @GetMapping("/search")
-    public List<ticket.GetTripDto> search(@RequestBody ticket.SearchTripDto searchParameters){
+    public List<GetTripDto> search(@RequestBody SearchTripDto searchParameters){
         return ticketService.search(searchParameters);
     }
 }

@@ -1,10 +1,11 @@
 package mutlu.ticketingapp.service;
 
 
+import mutlu.ticketingapp.dto.email_and_sms_service.RegistrationEmailDto;
 import mutlu.ticketingapp.dto.user.*;
 import mutlu.ticketingapp.entity.User;
-import mutlu.ticketingapp.exception.FieldsDoesNotMatchExceptionAbstract;
-import mutlu.ticketingapp.exception.LoginExceptionAbstract;
+import mutlu.ticketingapp.exception.FieldsDoesNotMatchException;
+import mutlu.ticketingapp.exception.LoginException;
 import mutlu.ticketingapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class UserService {
                 .setUserType(request.userType())
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new user: {}", user);
-        //TODO Send email.
+        rabbitTemplate.convertAndSend(new RegistrationEmailDto(GetUserDto.fromUser(user)));
         return GetUserDto.fromUser(userRepository.save(user));
     }
 
@@ -80,11 +81,11 @@ public class UserService {
                 return user;
             } else {
                 log.info("Wrong password when logging in. Username: {}", email);
-                throw new LoginExceptionAbstract();
+                throw new LoginException();
             }
         } else {
             log.info("User doesn't exists: {}", email);
-            throw new LoginExceptionAbstract();
+            throw new LoginException();
         }
     }
 
@@ -96,7 +97,7 @@ public class UserService {
         //Authenticate the user.
         var user = login(request.oldEmail(), request.password());
         if (!request.newEmailFirst().equals(request.newEmailSecond())) {
-            throw new FieldsDoesNotMatchExceptionAbstract("Email");
+            throw new FieldsDoesNotMatchException("Email");
         }
         log.info("Changing email for {} to {}", user.getEmail(), request.newEmailFirst());
         user.setEmail(request.newEmailFirst());
@@ -120,9 +121,8 @@ public class UserService {
             userRepository.flush();
             log.debug("Password hash after flush {}", userRepository.findById(user.getUserId()).get().getPasswordHash());
         } else {
-            throw new FieldsDoesNotMatchExceptionAbstract("Password");
+            throw new FieldsDoesNotMatchException("Password");
         }
         return GetUserDto.fromUser(user);
     }
-
 }

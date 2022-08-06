@@ -1,7 +1,7 @@
 package mutlu.ticketingapp.config;
 
 import mutlu.ticketingapp.common.PaymentResponse;
-import mutlu.ticketingapp.dto.ticket;
+import mutlu.ticketingapp.dto.ticket.PaymentRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(value = "paymentClient", url = "${ticketing.payment.url}")
 public interface PaymentClient {
     @PostMapping("/payment")
-    PaymentResponse createPayment(@RequestBody ticket.PaymentRequestDto paymentRequestDto);
+    PaymentResponse createPayment(@RequestBody PaymentRequestDto paymentRequestDto);
 }

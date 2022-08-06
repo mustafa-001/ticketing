@@ -2,9 +2,9 @@ package mutlu.ticketingapp.exception;
 
 import mutlu.ticketingapp.common.UserType;
 
-public class UserCannotBuyMoreTicketsExceptionAbstract extends AbstractTicketingException {
+public class UserCannotBuyMoreTicketsException extends AbstractTicketingException {
     private UserType userType;
-    public UserCannotBuyMoreTicketsExceptionAbstract(UserType userType) {
+    public UserCannotBuyMoreTicketsException(UserType userType) {
         super("A "+ userType.toString()+ " user cannot by more than 5 ticket.");
         this.userType = userType;
     }

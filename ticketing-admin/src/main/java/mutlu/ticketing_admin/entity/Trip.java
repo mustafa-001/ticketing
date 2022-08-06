@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ public class Trip {
     private String arrivalStation;
     @FutureOrPresent
     private LocalDateTime departure;
+
+    @NotNull
+    private BigDecimal price;
     @OneToMany(mappedBy = "trip")
     private List<Ticket> ticketList = new ArrayList<>();
 
@@ -82,6 +86,15 @@ public class Trip {
 
     public Trip setTicketList(List<Ticket> ticketList) {
         this.ticketList = ticketList;
+        return this;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public Trip setPrice(BigDecimal price) {
+        this.price = price;
         return this;
     }
 }

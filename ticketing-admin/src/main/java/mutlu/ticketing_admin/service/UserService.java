@@ -87,7 +87,7 @@ public class UserService {
     }
 
     /**
-     * If logging user in is successfull (to make sure credentials right)
+     * If logging user in is successful (to make sure credentials right)
      * changes user's username.
      */
     public GetUserDto changeEmail(ChangeEmailDto request) {
