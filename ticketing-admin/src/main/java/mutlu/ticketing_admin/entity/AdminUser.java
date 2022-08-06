@@ -17,6 +17,7 @@ import java.util.List;
  */
 //If another entity includes a User field when serializing/deserializing refer that field with it userId.
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
+@Entity
 public class AdminUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
