@@ -49,7 +49,7 @@ public class UserService {
                 .setUserType(request.userType())
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new user: {}", user);
-        rabbitTemplate.convertAndSend(new RegistrationEmailDto(GetUserDto.fromUser(user)));
+        rabbitTemplate.convertAndSend(new RegistrationEmailDto(user.getEmail(), user.getFirstName(), user.getLastName())));
         return GetUserDto.fromUser(userRepository.save(user));
     }
 

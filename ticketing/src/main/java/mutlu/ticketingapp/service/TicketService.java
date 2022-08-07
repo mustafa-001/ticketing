@@ -151,12 +151,14 @@ public class TicketService {
             ticket = ticketRepository.save(ticket);
             getTicketDtos.add(GetTicketDto.fromTicket(ticket));
         }
+
         PaymentRequestDto paymentRequest = new PaymentRequestDto(requests.get(0).clientPaymentInfoDto(), user.getUserId(), trip.getTripId(),
                 trip.getPrice().multiply(BigDecimal.valueOf(requests.size())));
-
         handlePayment(paymentRequest);
+
         TicketInformationMessageDto ticketInformationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), GetTripDto.fromTrip(trip), (long) getTicketDtos.size());
         rabbitTemplate.convertAndSend("ticketing.sms", ticketInformationMessage);
+
         return getTicketDtos;
     }
 

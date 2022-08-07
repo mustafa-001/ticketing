@@ -47,9 +47,11 @@ public class AdminUserService {
                 .setLastName(request.lastName())
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new adminUser: {}", adminUser);
-        GetAdminUserDto getAdminUserDto = GetAdminUserDto.fromAdminUser(adminUserRepository.save(adminUser));
-        rabbitTemplate.convertAndSend(new AdminRegistrationEmailDto(getAdminUserDto));
-        return getAdminUserDto;
+        adminUserRepository.save(adminUser);
+
+        rabbitTemplate.convertAndSend("ticketing.email", new RegistrationEmailDto(adminUser.getEmail(),
+                adminUser.getFirstName(), adminUser.getLastName()));
+        return GetAdminUserDto.fromAdminUser(adminUser);
     }
 
     /**

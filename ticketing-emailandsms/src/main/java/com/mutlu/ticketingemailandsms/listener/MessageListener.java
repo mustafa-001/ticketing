@@ -34,9 +34,9 @@ public class MessageListener {
     public void emailListener(RegistrationEmailDto emailDto) {
         log.info("Got a request for sending an email, {}", emailDto);
         Message email = new Email();
-        email.setMessage("Sayın " + emailDto.userDto().firstName() + " " +
-                emailDto.userDto().lastName() + " bilet uygulamasına kaydoldunuz.");
-        email.setReceiver(emailDto.userDto().email());
+        email.setMessage("Sayın " + emailDto.firstName() + " " +
+                emailDto.lastName() + " bilet uygulamasına kaydoldunuz.");
+        email.setReceiver(emailDto.email());
         sendMessage(email);
     }
 

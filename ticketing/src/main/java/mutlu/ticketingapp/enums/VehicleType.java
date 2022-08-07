@@ -5,6 +5,7 @@ public enum VehicleType {
     BUS(45);
 
     private final int capacity;
+
     VehicleType(int capacity) {
         this.capacity = capacity;
     }

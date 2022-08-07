@@ -1,5 +1,5 @@
 package com.mutlu.ticketingemailandsms.dto;
 
 
-public record RegistrationEmailDto(GetUserDto userDto) {
+public record RegistrationEmailDto(String email, String firstName, String lastName) {
 }

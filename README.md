@@ -33,7 +33,7 @@ sorgulamasını sağlar.
 
 - `AdminUser` bir yönetici kullanıcıyı temsil eder. Amaçları farklı olduğu için `User` entity'si
 ile polimorfik bir ilişkisi yoktur ve farklı bir tabloda saklanır. `User`'ın amacı bilet satın almak, `AdminUser`ın amacı
-seferleri kontrol etmektir. Aralarında herhangi bir is-as yada has-is ilişkisi yoktur.
+seferleri kontrol etmektir. Aralarında herhangi bir is-a yada has-a ilişkisi yoktur.
 - `Trip` detayları sisteme girilmiş bir seferi temsil eder, yönetici yetkisine sahip kullanıcılar tarafından girilir/düzenlenir,
 bireysel/kurumsal kullanıcılar tarafında okunur.
 
