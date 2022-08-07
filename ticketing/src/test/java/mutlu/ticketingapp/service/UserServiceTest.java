@@ -1,9 +1,9 @@
 package mutlu.ticketingapp.service;
 
 
-import mutlu.ticketingapp.enums.UserType;
 import mutlu.ticketingapp.dto.user.*;
 import mutlu.ticketingapp.entity.User;
+import mutlu.ticketingapp.enums.UserType;
 import mutlu.ticketingapp.exception.FieldsDoesNotMatchException;
 import mutlu.ticketingapp.exception.LoginException;
 import mutlu.ticketingapp.exception.UserAlreadyExistException;
@@ -18,7 +18,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.security.InvalidParameterException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,22 +51,23 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldThrowUserAlreadyExistsExceptionWhenEmailIsUsed(){
+    void shouldThrowUserAlreadyExistsExceptionWhenEmailIsUsed() {
         when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
         CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
                 "aa", "bb", "password", "differentPassword");
 
         Throwable ex = catchThrowable(() -> userService.create(userDto));
 
-        assertThat(ex instanceof UserAlreadyExistException);
+        assertThat(ex).isInstanceOf(UserAlreadyExistException.class);
     }
+
     @Test
     void shouldThrowExceptionWhenPasswordsDoesNotMatch() {
         CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
                 "aa", "bb", "password", "differentPassword");
 
         Throwable exception = catchThrowable(() -> userService.create(userDto));
-        assertThat(exception instanceof FieldsDoesNotMatchException);
+        assertThat(exception).isInstanceOf(FieldsDoesNotMatchException.class);
     }
 
     @Test
@@ -84,7 +84,7 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldEncyrptPasswordWhenRegistry() {
+    void shouldEncyrptPasswordWhenRegistring() {
         CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
                 "aa", "bb", "password", "password");
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(new User());
@@ -107,7 +107,7 @@ class UserServiceTest {
 
         Throwable ex = catchThrowable(() -> userService.getByUserId(1L));
 
-        assertThat(ex instanceof InvalidParameterException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
 
     }
 
@@ -126,19 +126,22 @@ class UserServiceTest {
     @Test
     void shouldThrowLoginExceptionWhenUserWithEmailDoesNotExist() {
         when(userRepository.findUserByEmail("aaa@bbb.com")).thenReturn(Optional.empty());
+        LoginCredentialsDto loginCredentialsDto = new LoginCredentialsDto("aaa@bbb.com", "123456");
 
-        Throwable ex = catchThrowable(() -> userService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> userService.login(loginCredentialsDto));
 
-        assertThat(ex instanceof LoginException);
+        assertThat(ex).isInstanceOf(LoginException.class);
     }
 
     @Test
     void shouldThrowLoginExceptionWhenPasswordsDoesNotMatch() {
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(false);
+        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        ChangePasswordDto changePasswordDto = new ChangePasswordDto("aa@bb.email", "123456", "1111", "1111");
 
-        Throwable ex = catchThrowable(() -> userService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> userService.changePassword(changePasswordDto));
 
-        assertThat(ex instanceof LoginException);
+        assertThat(ex).isInstanceOf(LoginException.class);
     }
 
     @Test
@@ -176,7 +179,7 @@ class UserServiceTest {
 
         Throwable ex = catchThrowable(() -> userService.changeEmail(changeEmailDto));
 
-        assertThat(ex instanceof FieldsDoesNotMatchException);
+        assertThat(ex).isInstanceOf(FieldsDoesNotMatchException.class);
     }
 
     @Test
@@ -204,7 +207,7 @@ class UserServiceTest {
 
         Throwable ex = catchThrowable(() -> userService.changePassword(changePasswordDto));
 
-        assertThat(ex instanceof FieldsDoesNotMatchException);
+        assertThat(ex).isInstanceOf(FieldsDoesNotMatchException.class);
     }
 
     @Test
@@ -222,7 +225,7 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldUpdateFirstNameAndSecondName(){
+    void shouldUpdateFirstNameAndSecondName() {
         UpdateUserDto updateUserDto = new UpdateUserDto(1L, "name", "surname");
         when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
 
@@ -238,7 +241,7 @@ class UserServiceTest {
 
         Throwable ex = catchThrowable(() -> userService.update(new UpdateUserDto(1L, "", "")));
 
-        assertThat(ex instanceof InvalidParameterException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 
 }

@@ -1,6 +1,5 @@
 package mutlu.ticketingapp.service;
 
-import mutlu.ticketingapp.enums.*;
 import mutlu.ticketingapp.config.PaymentClient;
 import mutlu.ticketingapp.dto.email_and_sms_service.TicketInformationMessageDto;
 import mutlu.ticketingapp.dto.ticket.ClientPaymentInfoDto;
@@ -10,7 +9,9 @@ import mutlu.ticketingapp.dto.ticket.SearchTripDto;
 import mutlu.ticketingapp.entity.Ticket;
 import mutlu.ticketingapp.entity.Trip;
 import mutlu.ticketingapp.entity.User;
+import mutlu.ticketingapp.enums.*;
 import mutlu.ticketingapp.exception.CannotSellTicketsException;
+import mutlu.ticketingapp.exception.NotEnoughTicketsLeftException;
 import mutlu.ticketingapp.exception.UserCannotBuyMoreTicketsException;
 import mutlu.ticketingapp.repository.TicketRepository;
 import mutlu.ticketingapp.repository.TripRepository;
@@ -24,7 +25,6 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -101,7 +102,7 @@ public class TicketServiceTest {
 
         Throwable exception = catchThrowable(() -> ticketService.addTicket(createTicketDto));
 
-        assertThat(exception instanceof InvalidParameterException);
+        assertThat(exception).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -110,7 +111,7 @@ public class TicketServiceTest {
 
         Throwable exception = catchThrowable(() -> ticketService.addTicket(createTicketDto));
 
-        assertThat(exception instanceof InvalidParameterException);
+        assertThat(exception).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class TicketServiceTest {
 
         Throwable exception = catchThrowable(() -> ticketService.addTicket(createTicketDto));
 
-        assertThat(exception instanceof UserCannotBuyMoreTicketsException);
+        assertThat(exception).isInstanceOf(UserCannotBuyMoreTicketsException.class);
     }
 
 
@@ -147,7 +148,7 @@ public class TicketServiceTest {
 
         Throwable exception = catchThrowable(() -> ticketService.addTicket(createTicketDto));
 
-        assertThat(exception instanceof UserCannotBuyMoreTicketsException);
+        assertThat(exception).isInstanceOf(UserCannotBuyMoreTicketsException.class);
     }
 
     @Test
@@ -160,11 +161,12 @@ public class TicketServiceTest {
         trip.setVehicleType(VehicleType.BUS);
 
         Mockito.when(ticketRepository.findByTrip(Mockito.any())).thenReturn(tickets);
+        Mockito.when(ticketRepository.findByUserAndTrip(Mockito.any(), Mockito.any())).thenReturn(List.of());
         Mockito.when(tripRepository.findById(Mockito.any())).thenReturn(Optional.of(trip));
 
         Throwable exception = catchThrowable(() -> ticketService.addTicket(createTicketDto));
 
-        assertThat(exception instanceof UserCannotBuyMoreTicketsException);
+        assertThat(exception).isInstanceOf(NotEnoughTicketsLeftException.class);
     }
 
     @Test
@@ -208,28 +210,28 @@ public class TicketServiceTest {
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhenUserIdFieldsAreNotSame() {
-        CreateTicketDto createTicketDto1 = new CreateTicketDto(1L, null, null, null);
-        CreateTicketDto createTicketDto2 = new CreateTicketDto(2L, null, null, null);
-        CreateTicketDto createTicketDto3 = new CreateTicketDto(3L, null, null, null);
+        CreateTicketDto createTicketDto1 = new CreateTicketDto(1L, null, PassengerGender.MALE, null);
+        CreateTicketDto createTicketDto2 = new CreateTicketDto(2L, null, PassengerGender.FEMALE, null);
+        CreateTicketDto createTicketDto3 = new CreateTicketDto(3L, null, PassengerGender.FEMALE, null);
         List<CreateTicketDto> ticketDtoList = List.of(createTicketDto1, createTicketDto2,
                 createTicketDto3);
 
         Throwable ex = catchThrowable(() -> ticketService.addTicketBulk(ticketDtoList));
 
-        assertThat(ex instanceof IllegalArgumentException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhenTripIdFieldsAreNotSame() {
-        CreateTicketDto createTicketDto1 = new CreateTicketDto(1L, 4L, null, null);
-        CreateTicketDto createTicketDto2 = new CreateTicketDto(1L, 5L, null, null);
-        CreateTicketDto createTicketDto3 = new CreateTicketDto(1L, 6L, null, null);
+        CreateTicketDto createTicketDto1 = new CreateTicketDto(1L, 4L, PassengerGender.MALE, null);
+        CreateTicketDto createTicketDto2 = new CreateTicketDto(1L, 5L, PassengerGender.MALE, null);
+        CreateTicketDto createTicketDto3 = new CreateTicketDto(1L, 6L, PassengerGender.FEMALE, null);
         List<CreateTicketDto> ticketDtoList = List.of(createTicketDto1, createTicketDto2,
                 createTicketDto3);
 
         Throwable ex = catchThrowable(() -> ticketService.addTicketBulk(ticketDtoList));
 
-        assertThat(ex instanceof IllegalArgumentException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -244,7 +246,7 @@ public class TicketServiceTest {
 
         Throwable ex = catchThrowable(() -> ticketService.addTicketBulk(ticketDtoList));
 
-        assertThat(ex instanceof CannotSellTicketsException);
+        assertThat(ex).isInstanceOf(CannotSellTicketsException.class);
     }
 
     @Test
@@ -286,7 +288,7 @@ public class TicketServiceTest {
 
         Throwable ex = catchThrowable(() -> ticketService.getByUserId(1000L));
 
-        assertThat(ex instanceof IllegalArgumentException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -311,7 +313,7 @@ public class TicketServiceTest {
         Mockito.when(ticketRepository.findByUser(Mockito.any())).thenReturn(tickets);
 
         var ticketDtos = ticketService.getByUserId(3L);
-        assertThat(ticketDtos.stream().anyMatch(t -> t.ticketId() == 20L));
+        assertTrue(ticketDtos.stream().anyMatch(t -> t.ticketId() == 20L));
     }
 
     @Test
@@ -324,7 +326,6 @@ public class TicketServiceTest {
 
         verify(tripRepository, times(1)).findByDepartureStationAndArrivalStationAndVehicleType(
                 "depstation", "arrivalstation", VehicleType.BUS);
-        assertThat(trips.size() == 1);
     }
 
 

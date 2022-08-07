@@ -44,7 +44,7 @@ public class AdminUserService {
             throw new UserAlreadyExistException();
         }
         if (!request.firstPassword().equals(request.secondPassword())) {
-            throw new InvalidParameterException("Passwords doesn't match.");
+            throw new FieldsDoesNotMatchException("Password");
         }
         adminUser.setEmail(request.email())
                 .setFirstName(request.firstName())
@@ -89,7 +89,7 @@ public class AdminUserService {
     /**
      * Tries to log user in, if successful returns that User entity.
      *
-     * @throws LoginException
+     * @throws LoginException .
      */
     public GetAdminUserDto login(LoginCredentialsDto credentialsDto) {
         return GetAdminUserDto.fromAdminUser(login(credentialsDto.email(), credentialsDto.password()));

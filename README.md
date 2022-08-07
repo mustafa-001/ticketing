@@ -87,7 +87,7 @@ Sistemden `docker` ile de karşılanabilecek 3 teknolojiye gereksinim duyar.
 
 - PostgreSQL (localhost:5432 portunda çalışan)
 - MongoDB (localhost:27017 portunda çalışan)
-- RabbitMQ(localhost:5672 portunda çalışan)
+- RabbitMQ (localhost:5672 portunda çalışan)
 - PostgreSQL (localhost:5433 portunda çalışan)
 
 ### Çalıştırma
@@ -95,7 +95,7 @@ Daha sonra `ticketing`, `ticketing-admin`, `ticketing-payment` ve `ticketing-ema
 ile servisler sırasıyla 8080, 8081, 8082 ve 8083 portlarında ayağa kaldırılabilir.
 
 ### Test Etme Ve Kullanma
-- Ana dizindeki ticketing.postman_collection.json dosyasını Postman'e aktarılabilir.
+- Ana dizindeki ticketing.postman_collection.json dosyasını Postman'e aktarılarak tüm endpointler ve örnek veriye ulaşılabilir.
 
 ## Sistem Kabul ve Gereksinimleri
 

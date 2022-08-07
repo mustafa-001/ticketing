@@ -17,7 +17,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.security.InvalidParameterException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +58,7 @@ class AdminUserServiceTest {
 
         Throwable ex = catchThrowable(() -> adminUserService.create(userDto));
 
-        assertThat(ex instanceof UserAlreadyExistException);
+        assertThat(ex).isInstanceOf(UserAlreadyExistException.class);
     }
     @Test
     void shouldThrowExceptionWhenPasswordsDoesNotMatch() {
@@ -68,7 +67,7 @@ class AdminUserServiceTest {
 
         Throwable exception = catchThrowable(() -> adminUserService.create(userDto));
 
-        assertThat(exception instanceof FieldsDoesNotMatchException);
+        assertThat(exception).isInstanceOf(FieldsDoesNotMatchException.class);
     }
 
     @Test
@@ -80,7 +79,7 @@ class AdminUserServiceTest {
 
         adminUserService.create(userDto);
 
-        verify(rabbitTemplate, times(1)).convertAndSend(Mockito.any());
+        verify(rabbitTemplate, times(1)).convertAndSend(Mockito.anyString(), (Object) Mockito.any());
         verify(adminUserRepository, times(1)).save(Mockito.any());
     }
 
@@ -108,7 +107,7 @@ class AdminUserServiceTest {
 
         Throwable ex = catchThrowable(() -> adminUserService.getByUserId(1L));
 
-        assertThat(ex instanceof InvalidParameterException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
 
     }
 
@@ -127,19 +126,22 @@ class AdminUserServiceTest {
     @Test
     void shouldThrowLoginExceptionWhenUserWithEmailDoesNotExist() {
         when(adminUserRepository.findUserByEmail("aaa@bbb.com")).thenReturn(Optional.empty());
+        LoginCredentialsDto loginCredentialsDto = new LoginCredentialsDto("aaa@bbb.com", "123456");
 
-        Throwable ex = catchThrowable(() -> adminUserService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> adminUserService.login(loginCredentialsDto));
 
-        assertThat(ex instanceof LoginException);
+        assertThat(ex).isInstanceOf(LoginException.class);
     }
 
     @Test
     void shouldThrowLoginExceptionWhenPasswordsDoesNotMatch() {
         when(passwordEncoder.matches(Mockito.any(), Mockito.any())).thenReturn(false);
+        when(adminUserRepository.findById(Mockito.any())).thenReturn(Optional.of(adminUser));
+        ChangePasswordDto changePasswordDto = new ChangePasswordDto("aa@bb.email", "123456", "1111", "1111");
 
-        Throwable ex = catchThrowable(() -> adminUserService.getByUserId(1L));
+        Throwable ex = catchThrowable(() -> adminUserService.changePassword(changePasswordDto));
 
-        assertThat(ex instanceof LoginException);
+        assertThat(ex).isInstanceOf(LoginException.class);
     }
 
     @Test
@@ -177,7 +179,7 @@ class AdminUserServiceTest {
 
         Throwable ex = catchThrowable(() -> adminUserService.changeEmail(changeEmailDto));
 
-        assertThat(ex instanceof FieldsDoesNotMatchException);
+        assertThat(ex).isInstanceOf(FieldsDoesNotMatchException.class);
     }
 
     @Test
@@ -205,7 +207,7 @@ class AdminUserServiceTest {
 
         Throwable ex = catchThrowable(() -> adminUserService.changePassword(changePasswordDto));
 
-        assertThat(ex instanceof FieldsDoesNotMatchException);
+        assertThat(ex).isInstanceOf(FieldsDoesNotMatchException.class);
     }
 
     @Test

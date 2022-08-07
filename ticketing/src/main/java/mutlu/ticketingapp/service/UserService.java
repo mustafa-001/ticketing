@@ -46,7 +46,7 @@ public class UserService {
             throw new UserAlreadyExistException();
         }
         if (!request.firstPassword().equals(request.secondPassword())) {
-            throw new IllegalArgumentException("Passwords does not match.");
+            throw new FieldsDoesNotMatchException("Password");
         }
         user.setUserType(request.userType())
                 .setEmail(request.email())

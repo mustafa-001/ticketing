@@ -68,7 +68,7 @@ public class TripServiceTest {
         Mockito.when(tripRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         Optional<GetTripDto> getTripDto = tripService.getById(1337L);
-        assertThat(getTripDto.isEmpty());
+        assertThat(getTripDto).isEmpty();
     }
 
     @Test
@@ -82,21 +82,21 @@ public class TripServiceTest {
 
         BigDecimal totalGain = tripService.totalRevenueFromTrip(10L);
 
-        assertThat(totalGain.equals(BigDecimal.TEN.multiply(BigDecimal.valueOf(2L))));
+        assertThat(totalGain).isEqualTo(BigDecimal.TEN.multiply(BigDecimal.valueOf(2L)));
     }
 
     @Test
     void shouldReturnTotalOfSoldTicketsWhenCalled() {
         Ticket ticket1 = new Ticket();
         Ticket ticket2 = new Ticket();
-        trip.setTicketList(List.of(ticket2, ticket1));
-        trip.setPrice(BigDecimal.TEN);
+        when(trip.getTicketList()).thenReturn(List.of(ticket2, ticket1));
+        when(trip.getPrice()).thenReturn(BigDecimal.TEN);
 
         Mockito.when(tripRepository.findById(Mockito.any())).thenReturn(Optional.of(trip));
 
         long soldTickets = tripService.totalSoldTicketsFromTrip(10L);
 
-        assertThat(soldTickets = 2);
+        assertThat(soldTickets).isEqualTo(2);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class TripServiceTest {
 
         Throwable ex = catchThrowable(() -> tripService.totalRevenueFromTrip(10L));
 
-        assertThat(ex instanceof IllegalArgumentException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class TripServiceTest {
 
         Throwable ex = catchThrowable(() -> tripService.totalSoldTicketsFromTrip(10L));
 
-        assertThat(ex instanceof IllegalArgumentException);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
