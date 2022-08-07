@@ -6,6 +6,7 @@ import mutlu.ticketingapp.dto.user.*;
 import mutlu.ticketingapp.entity.User;
 import mutlu.ticketingapp.exception.FieldsDoesNotMatchException;
 import mutlu.ticketingapp.exception.LoginException;
+import mutlu.ticketingapp.exception.UserAlreadyExistException;
 import mutlu.ticketingapp.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,16 @@ class UserServiceTest {
         user.setEmail("aaa@bbb.com");
     }
 
+    @Test
+    void shouldThrowUserAlreadyExistsExceptionWhenEmailIsUsed(){
+        when(userRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(user));
+        CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",
+                "aa", "bb", "password", "differentPassword");
+
+        Throwable ex = catchThrowable(() -> userService.create(userDto));
+
+        assertThat(ex instanceof UserAlreadyExistException);
+    }
     @Test
     void shouldThrowExceptionWhenPasswordsDoesNotMatch() {
         CreateUserDto userDto = new CreateUserDto(UserType.CORPORATE, "abc@xyz.com", "5554443322",

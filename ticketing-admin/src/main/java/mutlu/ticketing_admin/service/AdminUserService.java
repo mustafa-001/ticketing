@@ -5,6 +5,7 @@ import mutlu.ticketing_admin.dto.*;
 import mutlu.ticketing_admin.entity.AdminUser;
 import mutlu.ticketing_admin.exception.FieldsDoesNotMatchException;
 import mutlu.ticketing_admin.exception.LoginException;
+import mutlu.ticketing_admin.exception.UserAlreadyExistException;
 import mutlu.ticketing_admin.repository.AdminUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,9 @@ public class AdminUserService {
      */
     public GetAdminUserDto create(CreateAdminUserDto request) {
         AdminUser adminUser = new AdminUser();
+        if (adminUserRepository.findUserByEmail(request.email()).isPresent()){
+            throw new UserAlreadyExistException();
+        }
         if (!request.firstPassword().equals(request.secondPassword())) {
             throw new InvalidParameterException("Passwords doesn't match.");
         }
@@ -78,6 +82,7 @@ public class AdminUserService {
         }
         log.info("Marking admin user {} as deleted.", userOpt.get());
         userOpt.get().setDeleted(true);
+        adminUserRepository.flush();
     }
 
 

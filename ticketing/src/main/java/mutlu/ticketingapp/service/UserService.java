@@ -6,6 +6,7 @@ import mutlu.ticketingapp.dto.user.*;
 import mutlu.ticketingapp.entity.User;
 import mutlu.ticketingapp.exception.FieldsDoesNotMatchException;
 import mutlu.ticketingapp.exception.LoginException;
+import mutlu.ticketingapp.exception.UserAlreadyExistException;
 import mutlu.ticketingapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public class UserService {
      */
     public GetUserDto create(CreateUserDto request) {
         User user = new User();
+        if (userRepository.findUserByEmail(request.email()).isPresent()){
+            throw new UserAlreadyExistException();
+        }
         if (!request.firstPassword().equals(request.secondPassword())) {
             throw new IllegalArgumentException("Passwords does not match.");
         }
@@ -49,7 +53,7 @@ public class UserService {
                 .setUserType(request.userType())
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new user: {}", user);
-        rabbitTemplate.convertAndSend(new RegistrationEmailDto(user.getEmail(), user.getFirstName(), user.getLastName())));
+        rabbitTemplate.convertAndSend(new RegistrationEmailDto(user.getEmail(), user.getFirstName(), user.getLastName()));
         return GetUserDto.fromUser(userRepository.save(user));
     }
 

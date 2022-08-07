@@ -5,6 +5,7 @@ import mutlu.ticketing_admin.dto.*;
 import mutlu.ticketing_admin.entity.AdminUser;
 import mutlu.ticketing_admin.exception.FieldsDoesNotMatchException;
 import mutlu.ticketing_admin.exception.LoginException;
+import mutlu.ticketing_admin.exception.UserAlreadyExistException;
 import mutlu.ticketing_admin.repository.AdminUserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,12 +50,24 @@ class AdminUserServiceTest {
         adminUser.setEmail("aaa@bbb.com");
     }
 
+
+    @Test
+    void shouldThrowUserAlreadyExistsExceptionWhenEmailIsUsed(){
+        when(adminUserRepository.findUserByEmail(Mockito.any())).thenReturn(Optional.of(adminUser));
+        CreateAdminUserDto userDto = new CreateAdminUserDto("abc@xyz.com",
+                "aa", "bb", "password", "differentPassword");
+
+        Throwable ex = catchThrowable(() -> adminUserService.create(userDto));
+
+        assertThat(ex instanceof UserAlreadyExistException);
+    }
     @Test
     void shouldThrowExceptionWhenPasswordsDoesNotMatch() {
         CreateAdminUserDto userDto = new CreateAdminUserDto("abc@xyz.com",
                 "aa", "bb", "password", "differentPassword");
 
         Throwable exception = catchThrowable(() -> adminUserService.create(userDto));
+
         assertThat(exception instanceof FieldsDoesNotMatchException);
     }
 
