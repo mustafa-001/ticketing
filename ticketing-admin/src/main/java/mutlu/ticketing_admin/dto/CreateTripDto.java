@@ -8,7 +8,9 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record CreateTripDto(VehicleType vehicleType, @NotBlank  String departureStation,
-                            @NotBlank  String arrivalStation, @FutureOrPresent LocalDateTime departureTime,
+public record CreateTripDto(@NotNull VehicleType vehicleType,
+                            @NotBlank String departureStation,
+                            @NotBlank String arrivalStation,
+                            @FutureOrPresent LocalDateTime departureTime,
                             @NotNull BigDecimal price) {
 }

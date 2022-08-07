@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Entity representing a user. Includes both account information (login etc) and usage details.
+ * This entity is managed by main ticketing service.
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
 @Where(clause = "deleted=false") //Do not return soft deleted entities in queries.

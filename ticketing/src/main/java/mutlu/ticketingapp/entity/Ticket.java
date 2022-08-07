@@ -6,7 +6,9 @@ import mutlu.ticketingapp.enums.PassengerGender;
 
 import javax.persistence.*;
 
-//If another entity includes a User field when serializing/deserializing refer that field with it userId.
+/**
+ * Entity representing a bought ticket.
+ */
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "ticketId")
 public class Ticket {
@@ -27,9 +29,8 @@ public class Ticket {
         return ticketId;
     }
 
-    public Ticket setTicketId(Long ticketId) {
+    public void setTicketId(Long ticketId) {
         this.ticketId = ticketId;
-        return this;
     }
 
     public User getUser() {

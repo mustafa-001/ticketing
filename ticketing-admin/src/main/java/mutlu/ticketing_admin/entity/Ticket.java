@@ -1,12 +1,12 @@
 package mutlu.ticketing_admin.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import javax.persistence.*;
 
-//If another entity includes a User field when serializing/deserializing refer that field with it userId.
-@Entity
+ /**
+  * Entity representing a bought ticket. This entity is managed by main
+  * in the database.
+  */
+ @Entity
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

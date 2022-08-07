@@ -1,3 +1,8 @@
+- [Uygulamanın Organizasyon Şeması](#uygulamanın-organizasyon-şeması)
+- [Sistemin Gereksinimleri ve Sistemi Çalıştırma](#sistemin-gereksinimleri-ve-sistemi-çalıştırma)
+  - [Gereken Teknolojiler](#gereken-teknolojiler)
+  - [Çalıştırma](#çalıştırma)
+  - [Test Etme Ve Kullanma](#test-etme-ve-kullanma)
 - [Uygulamanın Parçalarının Genel Açıklaması](#uygulamanın-parçalarının-genel-açıklaması)
   - [`ticketing` Uygulaması](#ticketing-uygulaması)
     - [Domainde kullanılan modeller ve veritabanı:](#domainde-kullanılan-modeller-ve-veritabanı)
@@ -7,10 +12,6 @@
     - [Domainde kullanılan modeller ve veritabanı:](#domainde-kullanılan-modeller-ve-veritabanı-2)
   - [`ticketing-emailandsms` Servisi](#ticketing-emailandsms-servisi)
     - [Domainde kullanılan modeller ve veritabanı:](#domainde-kullanılan-modeller-ve-veritabanı-3)
-- [Sistemin Gereksinimleri ve Sistemi Çalıştırma](#sistemin-gereksinimleri-ve-sistemi-çalıştırma)
-  - [Gereken Teknolojiler](#gereken-teknolojiler)
-  - [Çalıştırma](#çalıştırma)
-  - [Test Etme Ve Kullanma](#test-etme-ve-kullanma)
 - [Sistem Kabul ve Gereksinimleri](#sistem-kabul-ve-gereksinimleri)
 - [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
   - [`ticketing`](#ticketing)
@@ -18,6 +19,28 @@
   - [`ticketing-payment`](#ticketing-payment)
   - [`ticketing-emailandsms`](#ticketing-emailandsms)
 - [Sisteme Eklenebilecek Özellikler](#sisteme-eklenebilecek-özellikler)
+
+## Uygulamanın Organizasyon Şeması
+
+![Organizyon Şeması](ticketing-diagram.svg)
+## Sistemin Gereksinimleri ve Sistemi Çalıştırma
+### Gereken Teknolojiler
+Sistemden `docker` ile de karşılanabilecek 3 teknolojiye gereksinim duyar.
+`docker-compose.yml` dosyasında bunların hepsi tanımlıdır ve `docker compose up` ile çalıştırılabilir.
+
+- PostgreSQL (localhost:5432 portunda çalışan)
+- MongoDB (localhost:27017 portunda çalışan)
+- RabbitMQ (localhost:5672 portunda çalışan)
+- PostgreSQL (localhost:5433 portunda çalışan)
+
+### Çalıştırma
+Daha sonra `ticketing`, `ticketing-admin`, `ticketing-payment` ve `ticketing-emailandsms` dizinlerinde `./mvnw spring-boot:run`
+ile servisler sırasıyla 8080, 8081, 8082 ve 8083 portlarında ayağa kaldırılabilir.
+
+### Test Etme Ve Kullanma
+- Ana dizindeki ticketing.postman_collection.json dosyasını Postman'e aktarılarak tüm endpointler ve örnek veriye ulaşılabilir.
+
+
 ##  Uygulamanın Parçalarının Genel Açıklaması
 
 ### `ticketing` Uygulaması
@@ -77,25 +100,6 @@ Kullanıcılar sisteme kaydolduklarında e-posta, bilet aldıklarında da SMS g�
 - `Message` gönderilen her e-posta yada SMS'i temsil eden ana abstract sınıftır.
 - `Email` ve `SMS`, `Message` sınıfından kalıtım alırlar.
 - ticketing-message adlı MongoDB veritabanı kullanılır.
-
-
-
-## Sistemin Gereksinimleri ve Sistemi Çalıştırma
-### Gereken Teknolojiler
-Sistemden `docker` ile de karşılanabilecek 3 teknolojiye gereksinim duyar.
-`docker-compose.yml` dosyasında bunların hepsi tanımlıdır ve `docker compose up` ile çalıştırılabilir.
-
-- PostgreSQL (localhost:5432 portunda çalışan)
-- MongoDB (localhost:27017 portunda çalışan)
-- RabbitMQ (localhost:5672 portunda çalışan)
-- PostgreSQL (localhost:5433 portunda çalışan)
-
-### Çalıştırma
-Daha sonra `ticketing`, `ticketing-admin`, `ticketing-payment` ve `ticketing-emailandsms` dizinlerinde `./mvnw spring-boot:run`
-ile servisler sırasıyla 8080, 8081, 8082 ve 8083 portlarında ayağa kaldırılabilir.
-
-### Test Etme Ve Kullanma
-- Ana dizindeki ticketing.postman_collection.json dosyasını Postman'e aktarılarak tüm endpointler ve örnek veriye ulaşılabilir.
 
 ## Sistem Kabul ve Gereksinimleri
 

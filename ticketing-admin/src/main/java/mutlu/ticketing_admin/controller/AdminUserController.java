@@ -30,17 +30,17 @@ public class AdminUserController {
     }
 
     @PostMapping("/login")
-    public GetAdminUserDto login(@RequestBody LoginCredentialsDto loginCredentialsDto) {
+    public GetAdminUserDto login(@RequestBody @Valid LoginCredentialsDto loginCredentialsDto) {
         return adminUserService.login(loginCredentialsDto);
     }
 
     @PostMapping("/changeEmail")
-    public GetAdminUserDto changeEmail(@RequestBody ChangeEmailDto changeEmailDto) {
+    public GetAdminUserDto changeEmail(@RequestBody @Valid ChangeEmailDto changeEmailDto) {
         return adminUserService.changeEmail(changeEmailDto);
     }
 
     @PostMapping("/changePassword")
-    public GetAdminUserDto changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public GetAdminUserDto changePassword(@RequestBody @Valid ChangePasswordDto changePasswordDto) {
         return adminUserService.changePassword(changePasswordDto);
     }
 

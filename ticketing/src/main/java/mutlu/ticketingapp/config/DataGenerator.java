@@ -58,8 +58,7 @@ public class DataGenerator {
             trip1.setArrivalStation("İzmir");
             trip1.setVehicleType(VehicleType.BUS);
             trip1.setPrice(BigDecimal.valueOf(100));
-            trip1.setDeparture(LocalDateTime.now().plusDays(7));
-            trip1.setTripId(100L);
+            trip1.setDeparture(LocalDateTime.of(2024,1, 1,12,0));
             tripRepository.save(trip1);
 
             Trip trip2 = new Trip();
@@ -67,8 +66,7 @@ public class DataGenerator {
             trip2.setArrivalStation("Aydın");
             trip2.setVehicleType(VehicleType.BUS);
             trip2.setPrice(BigDecimal.valueOf(100));
-            trip2.setDeparture(LocalDateTime.now().plusDays(14));
-            trip2.setTripId(101L);
+            trip2.setDeparture(LocalDateTime.of(2024,1, 8,12,0));
             tripRepository.save(trip2);
 
             Trip trip3 = new Trip();
@@ -76,8 +74,7 @@ public class DataGenerator {
             trip3.setArrivalStation("İzmir");
             trip3.setVehicleType(VehicleType.BUS);
             trip3.setPrice(BigDecimal.valueOf(100000));
-            trip3.setDeparture(LocalDateTime.now().plusDays(7));
-            trip3.setTripId(102L);
+            trip3.setDeparture(LocalDateTime.of(2024,1, 1,12,0));
             trip3.setCancelled(true);
             tripRepository.save(trip3);
         }

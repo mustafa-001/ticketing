@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-//If another entity includes a Trip field when serializing/deserializing refer that field with it userId.
+/**
+ * Entity representing a Trip. This entity is managed by ticketing-admin service.
+ */
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tripId")
 @Where(clause = "is_cancelled=false") //Do not return cancelled entitites to client.
 @Entity
@@ -51,36 +53,32 @@ public class Trip {
         return vehicleType;
     }
 
-    public Trip setVehicleType(VehicleType vehicleType) {
+    public void setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
-        return this;
     }
 
     public String getDepartureStation() {
         return departureStation;
     }
 
-    public Trip setDepartureStation(String departureStation) {
+    public void setDepartureStation(String departureStation) {
         this.departureStation = departureStation;
-        return this;
     }
 
     public String getArrivalStation() {
         return arrivalStation;
     }
 
-    public Trip setArrivalStation(String arrivalStation) {
+    public void setArrivalStation(String arrivalStation) {
         this.arrivalStation = arrivalStation;
-        return this;
     }
 
     public LocalDateTime getDeparture() {
         return departure;
     }
 
-    public Trip setDeparture(LocalDateTime departure) {
+    public void setDeparture(LocalDateTime departure) {
         this.departure = departure;
-        return this;
     }
 
     public List<Ticket> getTicketList() {
@@ -96,17 +94,15 @@ public class Trip {
         return price;
     }
 
-    public Trip setPrice(BigDecimal price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
-        return this;
     }
 
     public Boolean getCancelled() {
         return isCancelled;
     }
 
-    public Trip setCancelled(Boolean cancelled) {
+    public void setCancelled(Boolean cancelled) {
         isCancelled = cancelled;
-        return this;
     }
 }

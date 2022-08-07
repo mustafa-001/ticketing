@@ -28,7 +28,7 @@ public class TicketController {
     }
 
     @PostMapping("/buyBulk")
-    public List<GetTicketDto> addAll(@RequestBody List<CreateTicketDto> requests){
+    public List<GetTicketDto> addAll(@RequestBody @Valid List<CreateTicketDto> requests){
         return ticketService.addTicketBulk(requests);
     }
 
@@ -38,7 +38,7 @@ public class TicketController {
     }
 
     @GetMapping("/search")
-    public List<GetTripDto> search(@RequestBody SearchTripDto searchParameters){
+    public List<GetTripDto> search(@RequestBody @Valid SearchTripDto searchParameters){
         return ticketService.search(searchParameters);
     }
 }

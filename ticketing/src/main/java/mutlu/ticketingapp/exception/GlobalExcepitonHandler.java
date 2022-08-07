@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -26,6 +27,14 @@ public class GlobalExcepitonHandler {
         return new ResponseEntity<>("Yanlış parametreler ile endpoint çağrıldı." +
                 exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handle(MethodArgumentNotValidException exception) {
+        log.error("An exception occurred - ValidationError: {}", exception.getMessage());
+        return new ResponseEntity<>("Parametrelerin formatı denetlenirken validasyon hatası oluştu. \n" +
+                exception.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handle(HttpMessageNotReadableException exception) {

@@ -30,22 +30,22 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public GetUserDto login(@RequestBody LoginCredentialsDto loginCredentialsDto) {
+    public GetUserDto login(@RequestBody @Valid LoginCredentialsDto loginCredentialsDto) {
         return userService.login(loginCredentialsDto);
     }
 
     @PostMapping("/changeEmail")
-    public GetUserDto changeEmail(@RequestBody ChangeEmailDto changeEmailDto) {
+    public GetUserDto changeEmail(@RequestBody @Valid ChangeEmailDto changeEmailDto) {
         return userService.changeEmail(changeEmailDto);
     }
 
     @PostMapping("/changePassword")
-    public GetUserDto changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public GetUserDto changePassword(@RequestBody @Valid ChangePasswordDto changePasswordDto) {
         return userService.changePassword(changePasswordDto);
     }
 
     @PutMapping("/update")
-    public GetUserDto upddte(@RequestBody UpdateUserDto updateUserDto){
+    public GetUserDto update(@RequestBody @Valid UpdateUserDto updateUserDto){
         return  userService.update(updateUserDto);
     }
 
