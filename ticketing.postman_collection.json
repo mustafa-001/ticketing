@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"mustafa@email.com\",\n    \"firstPassword\": \"123456\",\n    \"secondPassword\": \"123456\",\n    \"phoneNumber\":\" 5555555555\",\n    \"firstName\": \"Mustafa\",\n    \"lastName\": \"Mutlu\",\n    \"userType\": \"CORPORATE\"\n\n}",
+							"raw": "{\n    \"email\": \"mustafa1@email.com\",\n    \"firstPassword\": \"123456\",\n    \"secondPassword\": \"123456\",\n    \"phoneNumber\":\" 5555555555\",\n    \"firstName\": \"Mustafa\",\n    \"lastName\": \"Mutlu\",\n    \"userType\": \"CORPORATE\"\n\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -212,6 +212,34 @@
 			"name": "Admin",
 			"item": [
 				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"mustafa@email.com\",\n    \"firstPassword\": \"123456\",\n    \"secondPassword\": \"123456\",\n    \"firstName\": \"Mustafa\",\n    \"lastName\": \"Mutlu\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8081/admins/",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"admins",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete",
 					"request": {
 						"method": "DELETE",
@@ -226,49 +254,21 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/users/1",
+							"raw": "localhost:8081/admins/",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
-								"users",
-								"1"
+								"admins",
+								""
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Update",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"userId\": 71,\n    \"firstName\": \"mustafa ali\",\n    \"lastName\": \"mutlu\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/users/update",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"users",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "ChangePassword",
+					"name": "Change Password",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -282,13 +282,13 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/users/changePassword",
+							"raw": "localhost:8081/admins/changePassword",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
-								"users",
+								"admins",
 								"changePassword"
 							]
 						}
@@ -296,7 +296,7 @@
 					"response": []
 				},
 				{
-					"name": "ChangeEmail",
+					"name": "Change Email",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -310,13 +310,13 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/users/changeEmail",
+							"raw": "localhost:8081/admins/changeEmail",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
-								"users",
+								"admins",
 								"changeEmail"
 							]
 						}
@@ -338,13 +338,13 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/users/login",
+							"raw": "localhost:8081/admins/login",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
-								"users",
+								"admins",
 								"login"
 							]
 						}
@@ -352,7 +352,7 @@
 					"response": []
 				},
 				{
-					"name": "GetUser",
+					"name": "Get Admin User",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -369,41 +369,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/users/1",
+							"raw": "localhost:8081/admins/1",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
-								"users",
+								"admins",
 								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "CreateUser",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"mustafa@email.com\",\n    \"firstPassword\": \"123456\",\n    \"secondPassword\": \"123456\",\n    \"phoneNumber\":\" 5555555555\",\n    \"firstName\": \"Mustafa\",\n    \"lastName\": \"Mutlu\",\n    \"userType\": \"CORPORATE\"\n\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/users",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"users"
 							]
 						}
 					},

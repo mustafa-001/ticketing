@@ -26,7 +26,10 @@ public class UserService {
     Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AmqpTemplate rabbitTemplate) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       AmqpTemplate rabbitTemplate) {
+
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.rabbitTemplate = rabbitTemplate;
@@ -53,7 +56,10 @@ public class UserService {
                 .setUserType(request.userType())
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new user: {}", user);
-        rabbitTemplate.convertAndSend(new RegistrationEmailDto(user.getEmail(), user.getFirstName(), user.getLastName()));
+
+        rabbitTemplate.convertAndSend(new RegistrationEmailDto(
+                user.getEmail(), user.getFirstName(), user.getLastName()));
+
         return GetUserDto.fromUser(userRepository.save(user));
     }
 
