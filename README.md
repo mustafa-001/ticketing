@@ -92,6 +92,8 @@ bireysel/kurumsal kullanıcılar tarafında okunur.
 Kullanıcılar bir bilet satın aldığında ödeme işlemini simüle eden uygulamadır. `FeignClient` ile çalışır, gelen isteği
 veritabanına kaydeder ve ödemenin gerçekleştiğini işaret eden cevap döndürür.
 
+Her gelen isteği veritabanına ve log'a yazar.
+
 #### Domainde kullanılan modeller ve veritabanı:
 - `Payment` bir gerçekleştirilen bir ödemeyi temsil eder.
 - ticketing-payment adlı database kullanılır.
@@ -100,6 +102,8 @@ veritabanına kaydeder ve ödemenin gerçekleştiğini işaret eden cevap dönd�
 
 Kullanıcılar sisteme kaydolduklarında e-posta, bilet aldıklarında da SMS göndermeyi simüle eden servistir.
 `RabbitMQ` ile çalışır. 
+
+Her gelen isteği veritabanına ve log'a yazar.
 
 #### Domainde kullanılan modeller ve veritabanı:
 - `Message` gönderilen her e-posta yada SMS'i temsil eden ana abstract sınıftır.

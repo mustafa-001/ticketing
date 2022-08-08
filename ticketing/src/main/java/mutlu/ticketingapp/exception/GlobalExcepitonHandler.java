@@ -18,13 +18,13 @@ public class GlobalExcepitonHandler {
     @ExceptionHandler(AbstractTicketingException.class)
     public ResponseEntity<String> handle(AbstractTicketingException exception) {
         log.error("An exception occurred: {}", exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Birşeyler ters gitti \n"+exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handle(IllegalArgumentException exception) {
         log.error("An exception occurred: {}", exception.getMessage());
-        return new ResponseEntity<>("Yanlış parametreler ile endpoint çağrıldı." +
+        return new ResponseEntity<>("Yanlış parametreler ile endpoint çağrıldı.\n" +
                 exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
