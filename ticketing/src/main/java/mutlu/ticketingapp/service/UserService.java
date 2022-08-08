@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,8 @@ public class UserService {
     private final AmqpTemplate rabbitTemplate;
 
     Logger log = LoggerFactory.getLogger(UserService.class);
+    @Value("${rabbitmq.email.queue}")
+    private String emailQueueRoutingKey;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -57,7 +60,7 @@ public class UserService {
                 .setPasswordHash(passwordEncoder.encode(request.firstPassword()));
         log.info("Saving new user: {}", user);
 
-        rabbitTemplate.convertAndSend(new RegistrationEmailDto(
+        rabbitTemplate.convertAndSend(emailQueueRoutingKey, new RegistrationEmailDto(
                 user.getEmail(), user.getFirstName(), user.getLastName()));
 
         return GetUserDto.fromUser(userRepository.save(user));

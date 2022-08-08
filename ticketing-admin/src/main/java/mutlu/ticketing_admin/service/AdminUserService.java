@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ public class AdminUserService {
     private final AmqpTemplate rabbitTemplate;
 
     Logger log = LoggerFactory.getLogger(AdminUserService.class);
+
+    @Value("${rabbitmq.email.queue}")
+    private String emailQueueRoutingKey;
 
     @Autowired
     public AdminUserService(AdminUserRepository adminUserRepository, PasswordEncoder passwordEncoder,
@@ -53,7 +57,8 @@ public class AdminUserService {
         log.info("Saving new adminUser: {}", adminUser);
         adminUserRepository.save(adminUser);
 
-        rabbitTemplate.convertAndSend("ticketing.email", new RegistrationEmailDto(adminUser.getEmail(),
+        emailQueueRoutingKey = "ticketing.email";
+        rabbitTemplate.convertAndSend(emailQueueRoutingKey, new RegistrationEmailDto(adminUser.getEmail(),
                 adminUser.getFirstName(), adminUser.getLastName()));
         return GetAdminUserDto.fromAdminUser(adminUser);
     }

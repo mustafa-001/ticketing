@@ -12,6 +12,9 @@
     - [Domainde kullanılan modeller ve veritabanı:](#domainde-kullanılan-modeller-ve-veritabanı-2)
   - [`ticketing-emailandsms` Servisi](#ticketing-emailandsms-servisi)
     - [Domainde kullanılan modeller ve veritabanı:](#domainde-kullanılan-modeller-ve-veritabanı-3)
+  - [Temel Endpointlerin Dokümantasyonu](#temel-endpointlerin-dokümantasyonu)
+    - [`localhost:8080/`'de çalışan endpointler](#localhost8080de-çalışan-endpointler)
+    - [`localhost:8081/`'de çalışan endpointler](#localhost8081de-çalışan-endpointler)
 - [Sistem Kabul ve Gereksinimleri](#sistem-kabul-ve-gereksinimleri)
 - [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
   - [`ticketing`](#ticketing)
@@ -37,6 +40,8 @@ Sistemden `docker` ile de karşılanabilecek 3 teknolojiye gereksinim duyar.
 Daha sonra `ticketing`, `ticketing-admin`, `ticketing-payment` ve `ticketing-emailandsms` dizinlerinde `./mvnw spring-boot:run`
 ile servisler sırasıyla 8080, 8081, 8082 ve 8083 portlarında ayağa kaldırılabilir.
 
+Uygulama çalıştığında eğer veritabanları boşsa örnek test etmeyi kolaylaştırmak için örnek veri ekler.
+
 ### Test Etme Ve Kullanma
 - Ana dizindeki ticketing.postman_collection.json dosyasını Postman'e aktarılarak tüm endpointler ve örnek veriye ulaşılabilir.
 
@@ -50,7 +55,7 @@ bir kullanıcı olmasını gerektiren endpointler aldıkları parametrelerde `us
 kullanıcıları referans gösteren bir `Long` parametrenin olmasını gerektirir. 
 
 - `/users ` endpointi kullanıcıların kayıt olması, kullanıcı e-postası ve şifresini değiştirmesi, kullanıcı detaylarını 
-sorgulaması ve kullanıcıyı silmesi işlevlerini yapar.
+sorgulaması ve kullanıcıyı silmesi işlevlerini yapar. Kullanıcı silindiğinde veritabanından silinmesi yerine deleted field'ı `true` olarak işaretlenir ve arama sonuçlarından çıkarılır.
 - `/tickets` endpointi tek bir bilet alınması, çoklu alınması, kullanıcıların aldığı biletleri listeleyebilmesi ve
 mevcut seferler içinden arama yapması işlevlerini yapar.
 
@@ -68,9 +73,9 @@ kendisi için işlem yapacağını varsayar. (`login`, `changePassword` ve `chan
 Yönetici(admin) yetkisine sahip kullanıcıların kullancakları endpointleri içeren uygulamadır. 
 
 - `/adminUsers` endpointi yönetici kullanıcıların kayıt olması, kullanıcı e-postası ve şifresini değiştirmesi, 
-kullanıcı detaylarını sorgulaması ve kullanıcıyı silmesi işlevlerini yapar.
+kullanıcı detaylarını sorgulaması ve kullanıcıyı silmesi işlevlerini yapar. Kullanıcı silindiğinde veritabanından silinmesi yerine deleted field'ı `true` olarak işaretlenir ve arama sonuçlarından çıkarılır.
 - `/trips` endpointi yöneticilerin yeni sefer eklemesi, iptal etmesi, toplam bilet satışı ve elde edilen ücreti
-sorgulamasını sağlar.
+sorgulamasını sağlar. Bir sefer iptal edildiğinde yönetici kullanıcılar onu hala arama sonuçlarında görürler ancak bireysel/kurumsal kullanıcılar onu arama sonuçlarında göremezler.
 
 #### Domainde kullanılan modeller ve veritabanı:
 
@@ -100,6 +105,92 @@ Kullanıcılar sisteme kaydolduklarında e-posta, bilet aldıklarında da SMS g�
 - `Message` gönderilen her e-posta yada SMS'i temsil eden ana abstract sınıftır.
 - `Email` ve `SMS`, `Message` sınıfından kalıtım alırlar.
 - ticketing-message adlı MongoDB veritabanı kullanılır.
+
+### Temel Endpointlerin Dokümantasyonu
+
+#### `localhost:8080/`'de çalışan endpointler
+
+- POST /users 
+
+   Sisteme yeni bir bireysel/kurumsal kullanıcı ekler. İşlem başarılı olduğunda oluşturulan kullanıcının bilgilerinin (userId dahil) içeren bir cevap döndürür.
+
+  + Kullanıcının aynı şifreyi girdiğinden emin olmak için `firstPassword` ve `secondPassword` alanlarının aynı olması gerekir.
+   + `userType` `CORPORATE` yada `INDIVIDUAL` olabilir.
+   ``` json
+   {
+      "email": "firma@firmamail.com",
+      "firstPassword": "123456",
+      "secondPassword": "123456",
+      "phoneNumber":" 5555555555",
+      "firstName": "temsilci ismi",
+      "lastName": "temsilci soyadı",
+      "userType": "CORPORATE"
+   }
+   ```
+- POST /users/login
+  ```json
+   {
+      "email": "user1@email.com",
+      "password" : "123456"
+   }
+  ```
+
+- GET /tickets/search
+
+   Request gövdesindeki parametrelerin hepsine uyan `Trip` nesnelerini döndürür. İptal edilmiş olanları döndürmez.
+   ```json
+   {
+    
+      "departureStation": "Aydın",
+      "arrivalStation": "İzmir",
+      "vehicleType": "BUS",
+      "date": "2024-01-01"
+   }
+   ```
+
+- POST /tickets/buy
+   
+   + `userId` mevcut bir bireysel/kurumsal kullanıcıya, `tripId` iptal edilmemiş, `search` endpointi ile ulaşılabilen bir sefere ait olmalıdır.
+   + `paymentType` `CREDIT_CARD` yada `EFT` olabilir.
+
+   ```json
+   {
+      "userId": 5,
+      "tripId": 2,
+      "passengerGender": "FEMALE",
+      "clientPaymentInfoDto": {
+         "paymentType": "CREDIT_CARD",
+         "cardNumber": "1111333344445555"
+      }
+   }
+   ```
+
+- GET /ticket/user/{userId}
+   + `userId`'ye sahip kullanıcının aldığı tüm biletleri döndürür.
+
+#### `localhost:8081/`'de çalışan endpointler
+
+- POST /trips
+   
+   + Yeni bir sefer oluşturur. `vehicleType` `BUS` yada `PLANE` olabilir. `departureTime` geçmiş bir tarihi göstermemelidir.
+
+   ```json
+   {
+      "vehicleType": "BUS",
+      "departureStation": "Aydın",
+      "arrivalStation": "İzmir",
+      "departureTime": "2024-01-01T13:15:26.111",
+      "price": 100
+   }
+   ```
+
+- DELETE /trips/{tripId}
+   
+   + Mevcut bir seferi `cancelled` (iptal edilmiş) olarak işaretler. Kullanıcılar bu sefere bilet alamazlar. Mevcut alınmış biletlere herhangi bir işlem yapılmaz.
+
+- GET /trips/getSoldTickets/{tripId}
+
+- /admins url'sinde çalışan endpointlere localhost:8080/users'takilere benzer davranış gösterirler.
 
 ## Sistem Kabul ve Gereksinimleri
 
@@ -179,5 +270,6 @@ Kullanıcılar sisteme kaydolduklarında e-posta, bilet aldıklarında da SMS g�
 ## Sisteme Eklenebilecek Özellikler
 - Spring Security ile kullanıcı session yönetimi yapılabilir. Proje dahilinde olmadığı için özellikle yapılmadı.
 - KUllanıcılara bilet iptal etme yetkisi verilebilir, bilet iptal edildiğinde ödeme servisi veritabanında ücret iadesi olmalıdır.
+- Soft delete ile silinmiş olan kullanıcı hesapları ve iptal edilmiş seferleri geri getirilmesi özelliği eklenebilir.
 - Bilet satın alınırken koltuk numarası da dikkate alıabilir.
 - `ticketing` ve `ticketing-admin` arasında ortak olan sınıflar common isimli bir kütüphaneye alınabilir. Bu kodun çoklanmasını engeller. Sistem bu ödev aşamasında fazla komplike olmadığı için bunu uygulamak gereksiz bir overhead yaratabilir.

@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"firma@firmamail.com\",\n    \"firstPassword\": \"123456\",\n    \"secondPassword\": \"123456\",\n    \"phoneNumber\":\" 5555555555\",\n    \"firstName\": \"temsilci ismi\",\n    \"lastName\": \"temsilci soyadı\",\n    \"userType\": \"CORPORATE\"\n\n}",
+							"raw": "{\n    \"email\": \"firma@firmamail.com\",\n    \"firstPassword\": \"123456\",\n    \"secondPassword\": \"123456\",\n    \"phoneNumber\":\" 5555555555\",\n    \"firstName\": \"temsilci ismi\",\n    \"lastName\": \"temsilci soyadı\",\n    \"userType\": \"CORPORATE\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -648,7 +648,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/tickets/user/72",
+							"raw": "localhost:8080/tickets/user/5",
 							"host": [
 								"localhost"
 							],
@@ -656,7 +656,7 @@
 							"path": [
 								"tickets",
 								"user",
-								"72"
+								"5"
 							]
 						}
 					},

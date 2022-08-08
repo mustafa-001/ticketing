@@ -21,6 +21,7 @@ import mutlu.ticketingapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +37,8 @@ public class TicketService {
     private final AmqpTemplate rabbitTemplate;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
+    @Value("${rabbitmq.sms.queue}")
+    private String smsQueueRoutingKey;
 
     public TicketService(TicketRepository ticketRepository,
                          TripRepository tripRepository,
@@ -76,7 +79,7 @@ public class TicketService {
         GetTicketDto ticketDto = GetTicketDto.fromTicket(ticket);
         TicketInformationMessageDto ticketInformationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), GetTripDto.fromTrip(trip), (long) 1);
         log.info("Payment successful, sending SMS request to message queue. {}", ticketInformationMessage);
-        rabbitTemplate.convertAndSend("ticketing.sms", ticketInformationMessage);
+        rabbitTemplate.convertAndSend(smsQueueRoutingKey, ticketInformationMessage);
 
         return ticketDto;
     }
@@ -157,7 +160,7 @@ public class TicketService {
         handlePayment(paymentRequest);
 
         TicketInformationMessageDto ticketInformationMessage = new TicketInformationMessageDto(GetUserDto.fromUser(user), GetTripDto.fromTrip(trip), (long) getTicketDtos.size());
-        rabbitTemplate.convertAndSend("ticketing.sms", ticketInformationMessage);
+        rabbitTemplate.convertAndSend(smsQueueRoutingKey, ticketInformationMessage);
 
         return getTicketDtos;
     }

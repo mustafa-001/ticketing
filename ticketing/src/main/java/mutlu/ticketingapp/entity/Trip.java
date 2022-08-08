@@ -19,7 +19,7 @@ import java.util.List;
  * Entity representing a Trip. This entity is managed by ticketing-admin service.
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tripId")
-@Where(clause = "is_cancelled=false") //Do not return cancelled entitites to client.
+@Where(clause = "is_cancelled=false") //Do not return cancelled entities to client.
 @Entity
 public class Trip {
     @Id
